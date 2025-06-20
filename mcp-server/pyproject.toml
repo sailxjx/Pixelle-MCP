@@ -1,0 +1,15 @@
+[project]
+name = "pixel-mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.38.34",
+    "chardet>=5.2.0",
+    "edge-tts>=7.0.2",
+    "fastmcp>=2.7.0",
+    "pillow>=11.2.1",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+]

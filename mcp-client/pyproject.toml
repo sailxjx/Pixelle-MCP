@@ -1,0 +1,16 @@
+[project]
+name = "pixel-mcp-client"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "asyncpg>=0.30.0",
+    "boto3>=1.38.33",
+    "chainlit==2.5.5",
+    "chardet>=5.2.0",
+    "fastmcp>=2.7.1",
+    "openai>=1.84.0",
+    "python-dotenv>=1.1.0",
+    "socksio>=1.0.0",
+]

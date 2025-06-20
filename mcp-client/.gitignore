@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+dist/
+wheels/
+*.egg-info
+.DS_Store
+
+# Virtual environments
+.venv
+uv.lock
+
+temp
+.env*.local
+*.out
+*.log
+.files
+data
+
+persistence/data
+persistence/package.json
