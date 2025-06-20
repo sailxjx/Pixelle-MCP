@@ -42,8 +42,8 @@ fi
 # 激活当前环境
 source .venv/bin/activate
 
-# 安装依赖
-~/.local/bin/uv sync
+# 安装依赖（不修改lock文件）
+~/.local/bin/uv sync --frozen
 
 # 启动chainlit服务
 nohup chainlit run main.py --port $PORT --host 0.0.0.0 > server.log 2>&1 &
