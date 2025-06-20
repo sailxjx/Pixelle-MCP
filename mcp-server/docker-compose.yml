@@ -4,7 +4,7 @@ services:
   # MinIO 对象存储（S3兼容）
   minio:
     image: minio/minio:latest
-    container_name: aigc-mcp-minio
+    container_name: pixel-mcp-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_USERNAME}
@@ -24,7 +24,7 @@ services:
   # MinIO 初始化（创建Bucket）
   minio-init:
     image: minio/mc:latest
-    container_name: aigc-mcp-minio-init
+    container_name: pixel-mcp-minio-init
     depends_on:
       minio:
         condition: service_healthy
@@ -38,9 +38,9 @@ services:
     restart: "no"
 
   # AIGC MCP 服务
-  aigc-mcp:
+  mcp-server:
     build: .
-    container_name: aigc-mcp-app
+    container_name: pixel-mcp-server
     depends_on:
       minio:
         condition: service_healthy

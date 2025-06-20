@@ -21,8 +21,8 @@ echo "✅ 镜像构建成功"
 # 等构建完成后快速替换
 echo "🛑 停止现有容器..."
 if ! docker-compose down; then
-    echo "⚠️  停止容器时出现问题，但继续执行..."
-    echo "💡 可能是容器已经停止或配置问题"
+    echo "❌ 停止容器失败！"
+    exit 1
 fi
 
 echo "🚀 启动新容器..."
