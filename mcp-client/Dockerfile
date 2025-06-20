@@ -23,6 +23,9 @@ COPY . .
 # 使用uv安装依赖
 RUN uv sync --frozen --no-cache
 
+# 替换 MCP 服务器地址为 Docker 宿主机地址
+RUN sed -i '/const MCP_SERVER_BASE_URL/s/localhost/host.docker.internal/' /app/public/app.js
+
 # 确保使用虚拟环境中的Python
 ENV PATH="/app/.venv/bin:$PATH"
 

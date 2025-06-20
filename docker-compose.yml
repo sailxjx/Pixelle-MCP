@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # MinIO 对象存储（S3兼容）
+  minio:
+    image: minio/minio:latest
+    container_name: pixel-mcp-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USERNAME:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-password123}
+    ports:
+      - "9000:9000"  # API 端口
+      - "9001:9001"  # Web 控制台端口
+    volumes:
+      - ./mcp-server/data/minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  # MinIO 初始化（创建Bucket）
+  minio-init:
+    image: minio/mc:latest
+    container_name: pixel-mcp-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_USERNAME:-admin} ${MINIO_PASSWORD:-password123};
+      /usr/bin/mc mb myminio/${MINIO_BUCKET:-aigc} --ignore-existing;
+      /usr/bin/mc anonymous set public myminio/${MINIO_BUCKET:-aigc};
+      exit 0;
+      "
+    restart: "no"
+
+  # AIGC MCP 服务端
+  mcp-server:
+    build: ./mcp-server
+    container_name: pixel-mcp-server
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "9002:9002"
+    volumes:
+      - ./mcp-server/data:/data
+      - ./mcp-server/.env:/.env:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  # AIGC MCP 客户端
+  mcp-client:
+    build: ./mcp-client
+    container_name: pixel-mcp-client
+    ports:
+      - "9003:9003"
+    volumes:
+      - ./mcp-client/.env:/.env:ro
+      - ./mcp-client/data:/data
+    environment:
+      - CHAINLIT_HOST=0.0.0.0
+      - CHAINLIT_PORT=9003
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9003/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped 

@@ -4,12 +4,24 @@
 
 ## 🚀 快速启动
 
+### 本地部署
+
 ```bash
 # 安装依赖
 uv sync
 
 # 启动服务
 ./start.sh
+```
+
+### Docker 部署
+
+```bash
+# 使用 Docker Compose 启动
+docker-compose up -d
+
+# 或使用便捷脚本
+./docker-start.sh
 ```
 
 访问: http://localhost:9003
@@ -33,9 +45,27 @@ CHAINLIT_CHAT_LLM=gpt-4  # 聊天模型
 
 ## 🛠️ 开发
 
+### 本地开发
+
 ```bash
 # 开发模式启动
 chainlit run main.py --port 9003 --host 0.0.0.0 -w
+```
+
+### Docker 开发
+
+```bash
+# 查看容器日志
+docker-compose logs -f
+
+# 进入容器调试
+docker-compose exec mcp-client bash
+
+# 停止服务
+docker-compose down
+
+# 重新构建
+docker-compose build --no-cache
 ```
 
 ## 📁 项目结构

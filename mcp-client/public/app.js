@@ -1,3 +1,6 @@
+// 定义基础服务地址常量
+const MCP_SERVER_BASE_URL = "http://localhost:9002";
+
 function initMcp() {
     const mcpStorgeStr = localStorage.getItem("mcp_storage_key");
     let needInit = false;
@@ -21,7 +24,7 @@ function initMcp() {
             "tools": [],
             "clientType": "sse",
             "command": null,
-            "url": "http://localhost:9002/sse",
+            "url": MCP_SERVER_BASE_URL + "/sse",
             "status": "disconnected"
         }
     ];

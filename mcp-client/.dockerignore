@@ -24,7 +24,6 @@ coverage.xml
 
 # Docker 相关
 .dockerignore
-Dockerfile
 docker-compose.yml
 
 # IDE 和编辑器
