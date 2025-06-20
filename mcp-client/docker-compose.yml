@@ -4,7 +4,6 @@ services:
   # AIGC MCP 客户端
   mcp-client:
     build: .
-    container_name: pixel-mcp-client
     ports:
       - "9003:9003"
     volumes:
