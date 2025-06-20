@@ -64,6 +64,9 @@ services:
   mcp-client:
     build: ./mcp-client
     container_name: pixel-mcp-client
+    depends_on:
+      mcp-server:
+        condition: service_completed_successfully
     ports:
       - "9003:9003"
     volumes:
