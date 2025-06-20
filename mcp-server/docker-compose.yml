@@ -50,7 +50,9 @@ services:
       - "9002:9002"
     volumes:
       - ./data:/data
-      - ./.env:/.env:ro
+    env_file:
+      - .env
+      - .env.local
     healthcheck:
       test: ["CMD", "curl", "-f", "http://minio:9001/health"]
       interval: 30s

@@ -8,8 +8,10 @@ services:
     ports:
       - "9003:9003"
     volumes:
-      - ./.env:/.env:ro
       - ./data:/data
+    env_file:
+      - .env
+      - .env.local
     environment:
       - CHAINLIT_HOST=0.0.0.0
       - CHAINLIT_PORT=9003
