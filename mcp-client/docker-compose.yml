@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  # AIGC MCP 客户端
+  mcp-client:
+    build: .
+    container_name: pixel-mcp-client
+    ports:
+      - "9003:9003"
+    volumes:
+      - ./.env:/.env:ro
+      - ./data:/data
+    environment:
+      - CHAINLIT_HOST=0.0.0.0
+      - CHAINLIT_PORT=9003
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9003/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped 
