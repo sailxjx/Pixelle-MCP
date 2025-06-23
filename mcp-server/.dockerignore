@@ -53,9 +53,7 @@ tmp/
 *.tmp
 
 # 部署脚本
-start.sh
 redeploy.sh
-docker-compose.yml
 
 # 缓存
 .cache/
