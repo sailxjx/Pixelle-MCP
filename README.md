@@ -9,26 +9,46 @@
 
 ## 🚀 快速启动
 
-### 一键部署（推荐）
+### 远程部署（推荐）
+
+使用 `redeploy.sh` 脚本可以方便地部署到远程服务器：
 
 ```bash
-# 部署所有服务
+# 部署所有服务到远程服务器
 ./redeploy.sh
 
-# 仅重启服务端
+# 仅重启远程服务端
 ./redeploy.sh server
 
-# 仅重启客户端
+# 仅重启远程客户端
 ./redeploy.sh client
 
-# 强制重新构建
+# 强制重新构建远程服务
 ./redeploy.sh -f
 
 # 查看帮助
 ./redeploy.sh -h
+
+# 使用自定义服务器
+REMOTE_HOST=192.168.1.100 REMOTE_USER=user ./redeploy.sh
 ```
 
-### 手动部署
+**默认远程服务器配置**：
+- 服务器地址: `30.150.44.149`
+- 用户名: `sss`
+- 项目目录: `/home/sss/puke/workspace/pixel-mcp`
+
+可以通过环境变量自定义：
+```bash
+export REMOTE_HOST=your-server-ip
+export REMOTE_USER=your-username
+export PROJECT_DIR=/path/to/your/project
+./redeploy.sh
+```
+
+### 本地部署
+
+如果需要在本地部署，可以直接使用 Docker Compose：
 
 ```bash
 # 构建并启动所有服务
@@ -42,12 +62,22 @@ docker-compose ps
 
 # 查看日志
 docker-compose logs -f
+
+# 重启特定服务
+docker-compose restart mcp-server
+docker-compose restart mcp-client
 ```
 
 ## 📋 服务信息
 
 部署完成后，可以通过以下地址访问：
 
+**远程部署**：
+- **客户端**: http://30.150.44.149:9003 (Chainlit Web UI)
+- **服务端**: http://30.150.44.149:9002 (MCP Server)
+- **MinIO**: http://30.150.44.149:9001 (对象存储管理界面)
+
+**本地部署**：
 - **客户端**: http://localhost:9003 (Chainlit Web UI)
 - **服务端**: http://localhost:9002 (MCP Server)
 - **MinIO**: http://localhost:9001 (对象存储管理界面)
@@ -113,6 +143,32 @@ CHAINLIT_PORT=9003
 
 ## 🚀 快速体验
 
+### 远程部署体验
+
+1. **配置SSH连接**
+   ```bash
+   # 确保可以SSH连接到服务器
+   ssh-copy-id user@server-ip
+   ```
+
+2. **设置环境变量**（可选）
+   ```bash
+   export REMOTE_HOST=your-server-ip
+   export REMOTE_USER=your-username
+   export PROJECT_DIR=/path/to/project
+   ```
+
+3. **一键部署**
+   ```bash
+   ./redeploy.sh
+   ```
+
+4. **访问服务**
+   - 打开浏览器访问: http://your-server-ip:9003
+   - 开始使用 AIGC 工具！
+
+### 本地部署体验
+
 1. **克隆项目**
    ```bash
    git clone <repository-url>
@@ -126,9 +182,9 @@ CHAINLIT_PORT=9003
    cp mcp-client/.env.example mcp-client/.env
    ```
 
-3. **一键启动**
+3. **启动服务**
    ```bash
-   ./redeploy.sh
+   docker-compose up -d --build
    ```
 
 4. **访问服务**

@@ -62,7 +62,7 @@ services:
     build: ./mcp-client
     depends_on:
       mcp-server:
-        condition: service_completed_successfully
+        condition: service_healthy
     ports:
       - "9003:9003"
     volumes:
