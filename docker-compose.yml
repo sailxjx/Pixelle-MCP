@@ -75,9 +75,4 @@ services:
       - CHAINLIT_PORT=9003
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9003/health"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
     restart: unless-stopped 
