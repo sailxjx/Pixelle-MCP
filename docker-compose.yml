@@ -29,13 +29,13 @@ services:
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_USERNAME:-admin} ${MINIO_PASSWORD:-password123};
-      /usr/bin/mc mb myminio/${MINIO_BUCKET:-aigc} --ignore-existing;
-      /usr/bin/mc anonymous set public myminio/${MINIO_BUCKET:-aigc};
+      /usr/bin/mc mb myminio/${MINIO_BUCKET:-files} --ignore-existing;
+      /usr/bin/mc anonymous set public myminio/${MINIO_BUCKET:-files};
       exit 0;
       "
     restart: "no"
 
-  # AIGC MCP 服务端
+  # Pixel MCP 服务端
   mcp-server:
     build: ./mcp-server
     depends_on:
@@ -57,7 +57,7 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # AIGC MCP 客户端
+  # Pixel MCP 客户端
   mcp-client:
     build: ./mcp-client
     depends_on:

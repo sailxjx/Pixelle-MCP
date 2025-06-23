@@ -37,8 +37,8 @@ async def on_mcp(connection, session: ClientSession):
     
     cl.user_session.set("mcp_session", session)
     
-    # aigc-mcp单独适配
-    if connection.name == "aigc-mcp":
+    # pixel-mcp单独适配
+    if connection.name == "pixel-mcp":
         result_resource = await session.read_resource("usage://tools")
         usage_tools = result_resource.contents[0].text
         if usage_tools:

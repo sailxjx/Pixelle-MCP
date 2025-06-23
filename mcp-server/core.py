@@ -4,7 +4,7 @@ import logging
 import os
 
 # 初始化MCP服务器
-mcp = FastMCP("aigc-mcp")
+mcp = FastMCP("pixel-mcp")
 mcp_tool = mcp.tool
 mcp_resource = mcp.resource
 
