@@ -7,8 +7,8 @@ services:
     profiles: ["server", "all"]
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_USERNAME:-admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-password123}
+      MINIO_ROOT_USER: ${MINIO_USERNAME:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minio1234}
     ports:
       - "9000:9000"  # API 端口
       - "9001:9001"  # Web 控制台端口
@@ -30,7 +30,7 @@ services:
         condition: service_healthy
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_USERNAME:-admin} ${MINIO_PASSWORD:-password123};
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_USERNAME:-minio} ${MINIO_PASSWORD:-minio1234};
       /usr/bin/mc mb myminio/${MINIO_BUCKET:-files} --ignore-existing;
       /usr/bin/mc anonymous set public myminio/${MINIO_BUCKET:-files};
       exit 0;
