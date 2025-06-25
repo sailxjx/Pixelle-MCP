@@ -19,6 +19,8 @@ class ExecuteResult(BaseModel):
     audios_by_var: Optional[dict[str, list[str]]] = Field(None, description="The audios grouped by variables name")
     videos: Optional[list[str]] = Field(None, description="The video of the execution")
     videos_by_var: Optional[dict[str, list[str]]] = Field(None, description="The videos grouped by variables name")
+    texts: Optional[list[str]] = Field(None, description="The texts of the execution")
+    texts_by_var: Optional[dict[str, list[str]]] = Field(None, description="The texts grouped by variables name")
     outputs: Optional[dict[str, Any]] = Field(None, description="The outputs of the execution")
     msg: Optional[str] = Field(None, description="The message of the execution")
     
@@ -31,6 +33,8 @@ class ExecuteResult(BaseModel):
                 output += f"audios: {self.audios}"
             if self.videos:
                 output += f"videos: {self.videos}"
+            if self.texts:
+                output += f"texts: {self.texts}"
             return output
         elif self.status == "error":
             return f"Generation failed, status: {self.status}, msg: {self.msg}"
@@ -73,6 +77,15 @@ def transfer_result_files(result: ExecuteResult) -> ExecuteResult:
     for field in ["images_by_var", "audios_by_var", "videos_by_var"]:
         if data.get(field):
             data[field] = transfer_dict_urls(data[field])
+    
+    # texts是原生字符串，不需要转存
+    for field in ["texts"]:
+        if data.get(field):
+            data[field] = data[field]
+    for field in ["texts_by_var"]:
+        if data.get(field):
+            data[field] = data[field]
+    
     return ExecuteResult(**data)
 
 def execute_workflow(workflow: str, params: dict=None) -> ExecuteResult:
