@@ -1,10 +1,12 @@
 import json
+import time
 from venv import logger
 import chainlit as cl
 from typing import Any, Dict, List
 from openai import AsyncOpenAI
 from mcp import ClientSession
 import re
+from time_util import format_duration
 
 # 严格的媒体显示系统指令
 SYSTEM_INSTRUCTION = """
@@ -82,6 +84,14 @@ def _extract_content(content_list):
 @cl.step(type="tool")
 async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
     """执行 MCP 工具调用"""
+    # 记录开始时间
+    start_time = time.time()
+    
+    def _format_result_with_duration(content: str) -> str:
+        """统一格式化带耗时的结果"""
+        duration = time.time() - start_time
+        return f"[耗时{format_duration(duration)}] {content}"
+    
     current_step = cl.context.current_step
     current_step.input = tool_input
     current_step.name = tool_name
@@ -91,15 +101,17 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
     mcp_name = find_tool_connection(tool_name)
     if not mcp_name:
         error_msg = json.dumps({"error": f"Tool {tool_name} not found in any MCP connection"})
-        current_step.output = error_msg
-        return error_msg
+        result_with_duration = _format_result_with_duration(error_msg)
+        current_step.output = result_with_duration
+        return result_with_duration
     
     # 获取 MCP 会话
     mcp_session, _ = cl.context.session.mcp_sessions.get(mcp_name)
     if not mcp_session:
         error_msg = json.dumps({"error": f"MCP {mcp_name} not found in any MCP connection"})
-        current_step.output = error_msg
-        return error_msg
+        result_with_duration = _format_result_with_duration(error_msg)
+        current_step.output = result_with_duration
+        return result_with_duration
     
     try:
         # 调用 MCP 工具，返回 CallToolResult 对象
@@ -109,18 +121,21 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
         if result.isError:
             error_content = _extract_content(result.content)
             error_msg = json.dumps({"error": f"Tool execution failed: {error_content}"})
-            current_step.output = error_msg
-            return error_msg
+            result_with_duration = _format_result_with_duration(error_msg)
+            current_step.output = result_with_duration
+            return result_with_duration
         
         # 提取内容文本
         content = _extract_content(result.content)
-        current_step.output = content
-        return str(content)
+        result_with_duration = _format_result_with_duration(str(content))
+        current_step.output = result_with_duration
+        return result_with_duration
         
     except Exception as e:
         error_msg = json.dumps({"error": str(e)})
-        current_step.output = error_msg
-        return error_msg
+        result_with_duration = _format_result_with_duration(error_msg)
+        current_step.output = result_with_duration
+        return result_with_duration
 
 
 def _inject_system_instruction(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
