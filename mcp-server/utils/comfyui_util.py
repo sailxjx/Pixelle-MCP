@@ -26,15 +26,15 @@ class ExecuteResult(BaseModel):
     
     def to_llm_result(self) -> str:
         if self.status == "completed":
-            output = "Generated successfully, "
+            output = "Generated successfully"
             if self.images:
-                output += f"images: {self.images}"
+                output += f", images: {self.images}"
             if self.audios:
-                output += f"audios: {self.audios}"
+                output += f", audios: {self.audios}"
             if self.videos:
-                output += f"videos: {self.videos}"
+                output += f", videos: {self.videos}"
             if self.texts:
-                output += f"texts: {self.texts}"
+                output += f", texts: {self.texts}"
             return output
         elif self.status == "error":
             return f"Generation failed, status: {self.status}, msg: {self.msg}"

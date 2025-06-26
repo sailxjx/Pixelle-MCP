@@ -1,3 +1,4 @@
+from datetime import timedelta
 import json
 import time
 from venv import logger
@@ -6,6 +7,7 @@ from typing import Any, Dict, List
 from openai import AsyncOpenAI
 from mcp import ClientSession
 import re
+from httpx import Timeout
 from time_util import format_duration
 
 # 严格的媒体显示系统指令
@@ -115,11 +117,13 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
     
     try:
         # 调用 MCP 工具，返回 CallToolResult 对象
-        result = await mcp_session.call_tool(tool_name, tool_input)
+        logger.info(f"Calling MCP tool: {tool_name} with input: {tool_input}")
+        result = await mcp_session.call_tool(tool_name, tool_input, read_timeout_seconds=timedelta(hours=1))
         
         # 检查是否有错误
         if result.isError:
             error_content = _extract_content(result.content)
+            logger.error(f"Tool execution failed: {error_content}")
             error_msg = json.dumps({"error": f"Tool execution failed: {error_content}"})
             result_with_duration = _format_result_with_duration(error_msg)
             current_step.output = result_with_duration
@@ -127,11 +131,13 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
         
         # 提取内容文本
         content = _extract_content(result.content)
+        logger.info(f"Tool execution succeeded: {content}")
         result_with_duration = _format_result_with_duration(str(content))
         current_step.output = result_with_duration
         return result_with_duration
         
     except Exception as e:
+        logger.error(f"Tool execution failed: {e}")
         error_msg = json.dumps({"error": str(e)})
         result_with_duration = _format_result_with_duration(error_msg)
         current_step.output = result_with_duration
@@ -450,7 +456,7 @@ async def process_streaming_response(
             api_params["tools"] = tools
             api_params["tool_choice"] = "auto"
         
-        client = AsyncOpenAI()
+        client = AsyncOpenAI(timeout=Timeout(None))
         
         try:
             enhanced_messages, should_continue = await _handle_stream_response(
