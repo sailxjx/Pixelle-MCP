@@ -70,7 +70,7 @@ async def on_message(message: cl.Message):
             or isinstance(element, cl.Video)
         if is_media and element.path and not element.url:
             element.size = "small"
-            element.url = upload(element.path)
+            element.url = upload(element.path, filename=element.name)
             need_update = True
     if need_update:
         await message.update()

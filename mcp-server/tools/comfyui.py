@@ -146,6 +146,19 @@ def i2v_by_local_wan_fusionx(
     })
     return result.to_llm_result()
 
+
+@mcp_tool
+def s2t_by_local_whisper(
+    audio: str = Field(description="The audio to generate the text, must be a url"),
+):
+    """
+    Recognize speech from audio using local Whisper model.
+    """
+    result = execute_workflow("s2t_by_local_whisper.json", {
+        "audio": audio,
+    })
+    return result.to_llm_result()
+
 @mcp_tool
 def i2i_by_flux_kontext_pro(
     image: str = Field(description="The image to generate the image, must be a url"),
