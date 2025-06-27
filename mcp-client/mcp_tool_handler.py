@@ -356,8 +356,11 @@ async def _handle_stream_chunk(chunk, msg, current_tool_calls, current_args):
     return has_tool_call, choice.finish_reason
 
 
-async def _handle_stream_response(client, api_params, msg, enhanced_messages, messages):
+async def _handle_stream_response(client, api_params, enhanced_messages, messages):
     """处理单次流式响应"""
+    # 为这一轮响应创建独立的消息对象
+    msg = cl.Message(content="")
+    
     current_tool_calls = {}
     current_args = {}
     has_tool_call = False
@@ -377,6 +380,10 @@ async def _handle_stream_response(client, api_params, msg, enhanced_messages, me
                 # 检查完成状态
                 if finish_reason == 'tool_calls':
                     try:
+                        # 先发送当前轮次的消息（如果有内容的话）
+                        if msg.content and msg.content.strip():
+                            await msg.send()
+                        
                         # 执行工具调用
                         enhanced_messages = await _execute_tool_calls(
                             current_tool_calls, 
@@ -388,12 +395,15 @@ async def _handle_stream_response(client, api_params, msg, enhanced_messages, me
                         error_message = f"处理工具调用时发生错误: {str(e)}"
                         logger.error(error_message)
                         await msg.stream_token(f"\n{error_message}\n")
+                        await msg.send()
                         return messages, False  # 结束处理
                 
                 elif finish_reason:  # 其他完成原因
                     if not has_tool_call:
-                        # 处理媒体标记
+                        # 处理媒体标记并发送消息
                         await _process_media_markers(msg)
+                        if msg.content and msg.content.strip():
+                            await msg.send()
                         return messages, False  # 结束处理
                         
         except GeneratorExit:
@@ -411,9 +421,10 @@ async def _handle_stream_response(client, api_params, msg, enhanced_messages, me
     except Exception as api_error:
         logger.error(f"API request error: {api_error}")
     
-    # 如果没有工具调用，结束循环
+    # 如果没有工具调用，处理媒体标记并发送消息
     if not has_tool_call:
         await _process_media_markers(msg)
+        await msg.send()
         return messages, False
     
     return enhanced_messages, True
@@ -421,7 +432,6 @@ async def _handle_stream_response(client, api_params, msg, enhanced_messages, me
 
 async def process_streaming_response(
     messages: List[Dict[str, Any]], 
-    msg: cl.Message,
     model: str,
     **kwargs
 ) -> List[Dict[str, Any]]:
@@ -430,7 +440,6 @@ async def process_streaming_response(
     
     Args:
         messages: 消息历史
-        msg: Chainlit 消息对象
         model: 使用的模型名称
         **kwargs: 其他 OpenAI API 参数
         
@@ -460,7 +469,7 @@ async def process_streaming_response(
         
         try:
             enhanced_messages, should_continue = await _handle_stream_response(
-                client, api_params, msg, enhanced_messages, messages
+                client, api_params, enhanced_messages, messages
             )
             
             if not should_continue:

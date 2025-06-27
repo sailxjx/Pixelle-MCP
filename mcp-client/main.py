@@ -83,17 +83,12 @@ async def on_message(message: cl.Message):
     
     cl_messages = cl.chat_context.get()
     messages = messages_from_chaintlit_to_openai(cl_messages)
-
-    msg = cl.Message(content="")
     
     # 使用工具处理器处理流式响应和工具调用
     await tool_handler.process_streaming_response(
         messages=messages,
-        msg=msg,
         model=CHAINLIT_CHAT_LLM,
     )
-    
-    await msg.send()
 
 
 if __name__ == "__main__":
