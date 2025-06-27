@@ -166,6 +166,11 @@ def v2v_by_local_wan_fusionx_vace_no_ref(
     5. Composition and Perspective: Use cinematic framing techniques like close-ups, wide shots, low angles, or high angles to emphasize focus and perspective.
     6. Visual Style: Incorporate stylistic cues such as cinematic, vintage film look, shallow depth of field, or motion blur.
     7. Time and Environmental Context: Include relevant context such as time of day, weather conditions, and setting to enhance realism and immersion.
+    
+    Return:
+    - Returns two videos: the generated video and a comparison video (original vs generated side-by-side)
+    - By default, show users the generated video result
+    - If users specifically request to see the comparison video or both videos, provide accordingly
     """
     if quality == "low":
         size = 512

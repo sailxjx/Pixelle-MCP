@@ -27,14 +27,23 @@ class ExecuteResult(BaseModel):
     def to_llm_result(self) -> str:
         if self.status == "completed":
             output = "Generated successfully"
-            if self.images:
-                output += f", images: {self.images}"
-            if self.audios:
-                output += f", audios: {self.audios}"
-            if self.videos:
-                output += f", videos: {self.videos}"
-            if self.texts:
-                output += f", texts: {self.texts}"
+            
+            def format_media_output(media_type: str, media_list: list[str], by_var_dict: dict[str, list[str]]) -> str:
+                """格式化媒体输出，根据by_var的键数量决定显示格式"""
+                if by_var_dict and len(by_var_dict) > 1:
+                    # 多个 key 时显示键值对映射，取每个key的第一个值
+                    var_dict = {k: v[0] if v else None for k, v in by_var_dict.items()}
+                    return f", {media_type}: {var_dict}"
+                else:
+                    return f", {media_type}: {media_list}"
+            
+            # 处理各种媒体类型
+            for media_type in ["images", "audios", "videos", "texts"]:
+                media_list = getattr(self, media_type)
+                by_var_dict = getattr(self, f"{media_type}_by_var")
+                if media_list:
+                    output += format_media_output(media_type, media_list, by_var_dict)
+            
             return output
         elif self.status == "error":
             return f"Generation failed, status: {self.status}, msg: {self.msg}"
