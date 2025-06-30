@@ -69,7 +69,7 @@ def load_custom_starter(starter_file: Path) -> Optional[StarterModel]:
             data = json.load(f)
         
         return StarterModel(
-            label=data.get("label", expected_label),
+            label=expected_label,
             message=data.get("message", ""),
             icon=data.get("icon", "/public/text.svg"),
             image=data.get("image", None),
