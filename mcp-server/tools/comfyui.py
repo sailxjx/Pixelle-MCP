@@ -339,3 +339,20 @@ def t2s_by_edge_tts(
         "voice": voice,
     })
     return result.to_llm_result()
+
+@mcp_tool
+def t2s_by_index_tts(
+    text: str = Field(description="The text to generate the audio"),
+    # voice: Optional[str] = Field("default", description="The voice of the audio"),
+):
+    """
+    Convert text to speech using Edge TTS.
+    
+    Examples:
+    - "你好，我是小明，很高兴认识你"
+    """
+    result = execute_workflow("t2s_by_index_tts.json", {
+        "text": text,
+        # "voice": voice,
+    })
+    return result.to_llm_result()
