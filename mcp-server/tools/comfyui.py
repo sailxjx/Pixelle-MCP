@@ -41,6 +41,23 @@ def t2i_by_local_flux(
     return result.to_llm_result()
 
 @mcp_tool
+def image_merge(
+    first_image: str = Field(description="The first image to merge, must be a url"),
+    second_image: str = Field(description="The second image to merge, must be a url"),
+):
+    """
+    Merge two images into one along the horizontal axis.
+    
+    It is generally used when a user has input multiple pictures, but the parameter of the tool is only one picture.
+    For example, a user wants to generate image by kontext pro with multi reference images, and so on.
+    """
+    result = execute_workflow("image_merge.json", {
+        "first_image": first_image,
+        "second_image": second_image,
+    })
+    return result.to_llm_result()
+    
+@mcp_tool
 def i2t_by_local_florence(
     image: str = Field(description="The image to generate the text, must be a url"),
 ):
@@ -205,6 +222,7 @@ def i2i_by_flux_kontext_pro(
 ):
     """
     Edit existing images using text instructions with FLUX Kontext Pro model.
+    If user gives multiple images, you need call image_merge tool to merge them into one image first, then use this tool to edit the merged image.
     
     Modifies existing images based on your text instructions. You can change objects, 
     remove elements, alter text, modify colors, and more.
