@@ -1,0 +1,19 @@
+{
+  "message": "青蛙现在是一只老虎，用\"PixelLab\"代替\"ULTRA\"，其他文字保留。",
+  "icon": "/public/text.svg",
+  "image": "http://30.150.44.149:9000/files/761a69e25f574bc3afc48838c7931375.png",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "图片已按你的要求修改：青蛙变成了老虎，并将\"ULTRA\"替换为\"PixelLab\"，其他文字保持不变。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/813d264cafc443e69d7e49c1baa18d8d.png",
+          "size": "medium"
+        }
+      ]
+    }
+  ]
+}

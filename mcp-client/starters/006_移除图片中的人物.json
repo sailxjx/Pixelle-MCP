@@ -1,0 +1,19 @@
+{
+  "message": "移除人物",
+  "icon": "/public/remove-background.svg",
+  "image": "http://30.150.44.149:9000/files/eac6e8ac4b8a475ca10ef6dfbf836971.png",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "已为你移除图片中的人物，请查看下方新处理的图片。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/e76bc0ce93df4de9b305da883244933d.png",
+          "size": "large"
+        }
+      ]
+    }
+  ]
+}

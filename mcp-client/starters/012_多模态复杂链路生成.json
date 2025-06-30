@@ -1,0 +1,71 @@
+{
+  "message": "生成一个小狗的图片，然后再给图片加上\"Pawtist\"的标题，然后再做一个让这个小狗跳跃的视频，然后再生成一段描述文字，并转语音",
+  "icon": "/public/video.svg",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "step",
+      "name": "t2i_by_local_flux",
+      "input": {
+        "prompt": "A cute puppy sitting with a playful expression, bright eyes, soft fur, in a warm and cozy indoor setting, photorealistic",
+        "width": 512,
+        "height": 512
+      },
+      "output": "Generated successfully, images: ['http://30.150.44.149:9000/files/4d54d478629141eb8b93b45b1fed021d.png']"
+    },
+    {
+      "role": "ai",
+      "type": "step",
+      "name": "i2i_by_flux_kontext_pro",
+      "input": {
+        "image": "http://30.150.44.149:9000/files/4d54d478629141eb8b93b45b1fed021d.png",
+        "prompt": "Add the word 'Pawtist' as a bold title at the top of the image."
+      },
+      "output": "Generated successfully, images: ['http://30.150.44.149:9000/files/0f6f15eee9514abf9863fb684691d5c5.png']"
+    },
+    {
+      "role": "ai",
+      "type": "step",
+      "name": "i2v_by_kling_start_frame",
+      "input": {
+        "image": "http://30.150.44.149:9000/files/0f6f15eee9514abf9863fb684691d5c5.png",
+        "prompt": "让这只小狗开心地跳跃起来，尾巴摇摆，周围的环境充满活力与欢快的氛围。",
+        "model_name": "kling-v1-6",
+        "mode": "std"
+      },
+      "output": "Generated successfully, videos: ['http://30.150.44.149:9000/files/4b84a9077e7841c69e2fa8bf7be621ba.mp4']"
+    },
+    {
+      "role": "ai",
+      "type": "step",
+      "name": "t2s_by_edge_tts",
+      "input": {
+        "text": "这是一只活泼可爱的小狗，带着灿烂的笑容跳跃在温馨的室内环境中，展现出无限的欢乐与能量。",
+        "voice": "zh-CN-YunxiNeural"
+      },
+      "output": "文本转语音成功，音频文件: http://30.150.44.149:9000/files/b1f54c00c11b4a89b9eca4ae11bf560c.mp3"
+    },
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "我为你完成了以下AIGC创作流程：\n1. 生成了一只可爱小狗的图片，并加上了\"Pawtist\"标题。\n2. 根据这张图片制作了小狗跳跃的视频。\n3. 生成了一段描述文本，并为其配音。\n描述文字：这是一只活泼可爱的小狗，带着灿烂的笑容跳跃在温馨的室内环境中，展现出无限的欢乐与能量。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/0f6f15eee9514abf9863fb684691d5c5.png",
+          "size": "small"
+        },
+        {
+          "type": "audio",
+          "url": "http://30.150.44.149:9000/files/b1f54c00c11b4a89b9eca4ae11bf560c.mp3",
+          "size": "small"
+        },
+        {
+          "type": "video",
+          "url": "http://30.150.44.149:9000/files/4b84a9077e7841c69e2fa8bf7be621ba.mp4",
+          "size": "small"
+        }
+      ]
+    }
+  ]
+}

@@ -29,7 +29,7 @@ class StarterModel(BaseModel):
         )
 
 # 文件操作相关函数
-STARTERS_DIR = Path("./data/starters")
+STARTERS_DIR = Path("./starters")
 
 def ensure_starters_dir():
     """确保 starters 目录存在"""

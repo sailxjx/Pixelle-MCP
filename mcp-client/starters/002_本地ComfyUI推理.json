@@ -1,0 +1,18 @@
+{
+  "message": "生成一个赛博朋克的城市街道图片，走本地推理",
+  "icon": "/public/flow-compute.svg",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "我为你生成了一张赛博朋克风格的城市街道图片，展现了夜晚霓虹灯、未来感市民和高科技氛围。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/c6958285476b486da0e5916864ad801e.png",
+          "size": "large"
+        }
+      ]
+    }
+  ]
+}

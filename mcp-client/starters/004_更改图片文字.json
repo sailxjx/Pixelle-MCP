@@ -1,0 +1,19 @@
+{
+  "message": "把文字改为为\"PixelLab MCP\"",
+  "icon": "/public/text.svg",
+  "image": "http://30.150.44.149:9000/files/5b4c8282374848cda1f7da3752756f7a.png",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "已经将图片中的文字修改为\"PixelLab MCP\"。请查看下方生成的图片。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/a0b758ed59c146ebae6a0b7b58cf060e.png",
+          "size": "large"
+        }
+      ]
+    }
+  ]
+}

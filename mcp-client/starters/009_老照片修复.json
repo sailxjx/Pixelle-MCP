@@ -1,0 +1,36 @@
+{
+  "message": "给这张老照片上色",
+  "icon": "/public/video.svg",
+  "image": "http://30.150.44.149:9000/files/9b21af9cf583477e8af3b42dcadd2fa0.png",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "我已经为你给这张老照片上色，并尽量还原了真实的色彩。请查看生成的彩色版本。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/96d4748b578c49d38318a0e7f7458a59.png",
+          "size": "small"
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "type": "message",
+      "content": "再对上色后的图片生成视频，让图片中的两个人一边笑一边拥抱起来。"
+    },
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "我已经根据上色后的图片为你生成了一个视频，内容为图片中的两个人慢慢相视微笑，并逐渐靠近相互拥抱，画面温馨感人。请查看视频效果。",
+      "elements": [
+        {
+          "type": "video",
+          "url": "http://30.150.44.149:9000/files/7a955a69c4074d99a0a5f2852a187855.mp4",
+          "size": "small"
+        }
+      ]
+    }
+  ]
+}

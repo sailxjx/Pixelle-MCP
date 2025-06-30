@@ -1,0 +1,19 @@
+{
+  "message": "让图片里的人物摸了摸下巴，然后突然笑起来",
+  "icon": "/public/video.svg",
+  "image": "http://30.150.44.149:9000/files/7529378fc78347c4bc307b9eeb12a0c0.png",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "视频已生成，内容为图片中的人物先轻轻摸了摸下巴，然后突然露出灿烂的笑容。您可以点击下方视频进行查看。",
+      "elements": [
+        {
+          "type": "video",
+          "url": "http://30.150.44.149:9000/files/2fe27d90a36e46dc815b27d7c758c3c0.mp4",
+          "size": "small"
+        }
+      ]
+    }
+  ]
+}

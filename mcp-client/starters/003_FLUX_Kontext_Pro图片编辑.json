@@ -1,0 +1,19 @@
+{
+  "message": "我要编辑这张图片，让猫的衣服变成红色的，用FLUX模型。",
+  "icon": "/public/replace.svg",
+  "image": "http://30.150.44.149:9000/files/3c134c1de5c54d69b5f3ca59ab4771ad.jpg",
+  "preset_response": [
+    {
+      "role": "ai",
+      "type": "message",
+      "content": "我已经用FLUX模型编辑了图片，将猫的衣服变成了红色。请查看下方生成的图片。",
+      "elements": [
+        {
+          "type": "image",
+          "url": "http://30.150.44.149:9000/files/bde97c886ed34dc1a9ccce7c168ea8c1.png",
+          "size": "medium"
+        }
+      ]
+    }
+  ]
+}
