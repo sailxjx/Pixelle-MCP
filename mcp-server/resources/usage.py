@@ -14,14 +14,14 @@ USAGE = """
 - 默认使用 WAN2.1 FusionX 模型
 
 4. 图生视频（i2v）场景 - 重要选择逻辑：
-- **MUST ALWAYS默认首选使用 WAN2.1 FusionX 模型 (i2v_by_local_wan_fusionx)**
-- **ONLY当用户明确提到"Kling"、"可灵"或特别要求使用Kling模型时，才使用 Kling 模型**
+- **MUST ALWAYS 默认首选使用 WAN2.1 FusionX 模型 (i2v_by_local_wan_fusionx)**
+- **ONLY 当用户明确提到"Kling"、"可灵"或特别要求使用Kling模型时，才使用 Kling 模型**
 - WAN2.1 FusionX是默认的、推荐的、首选的i2v模型
 - 不要因为语言支持、界面友好等因素选择Kling，要始终优先选择WAN2.1 FusionX
 
 5. 文本转语音（t2s）场景：
-- 默认使用 t2s_by_index_tts 方案
-- 仅当用户明确要求使用 Edge TTS 时，才切换到 Edge TTS 方案
+- **MUST ALWAYS 默认首选 t2s_by_index_tts**
+- **ONLY 当用户明确要求使用 Edge TTS 时，才使用 t2s_by_edge_tts**
 
 注：当用户的表达不清晰或带有歧义时，请先跟用户确认，再选择工具调用。
 例如:
