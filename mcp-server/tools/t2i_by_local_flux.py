@@ -4,7 +4,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def t2i_by_local_flux(
+async def t2i_by_local_flux(
     prompt: str = Field(description="The prompt to generate the image, must be english"),
     width: int = Field(512, description="The width of the image"),
     height: int = Field(512, description="The height of the image"),
@@ -30,7 +30,7 @@ def t2i_by_local_flux(
     - "Ethereal dragon with neon lightning crystal on head, glowing blue eyes, majestic wings spread wide"
     """
     seed = random.randint(0, 1000000)
-    result = execute_workflow("flux_turbo.json", {
+    result = await execute_workflow(__file__, {
         "prompt": prompt,
         "width": width,
         "height": height,

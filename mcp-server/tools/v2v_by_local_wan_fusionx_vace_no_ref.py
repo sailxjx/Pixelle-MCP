@@ -4,7 +4,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def v2v_by_local_wan_fusionx_vace_no_ref(
+async def v2v_by_local_wan_fusionx_vace_no_ref(
     video: str = Field(description="The video to generate the video, must be a url"),
     prompt: str = Field(description="The prompt to generate the video, support Chinese and English"),
     quality: Literal["low", "high"] = Field("low", description="Video quality: 'low' for faster generation, 'high' for better quality"),
@@ -36,7 +36,7 @@ def v2v_by_local_wan_fusionx_vace_no_ref(
     else:
         raise ValueError(f"Invalid quality: `{quality}`")
     
-    result = execute_workflow("v2v_by_local_wan_fusionx_vace_no_ref.json", {
+    result = await execute_workflow(__file__, {
         "video": video,
         "prompt": prompt,
         "size": size,

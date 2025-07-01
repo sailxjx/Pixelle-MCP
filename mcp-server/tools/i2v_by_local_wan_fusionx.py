@@ -5,7 +5,7 @@ from utils.comfyui_util import execute_workflow
 from utils.image_util import detect_image_aspect_ratio_enum
 
 @mcp_tool
-def i2v_by_local_wan_fusionx(
+async def i2v_by_local_wan_fusionx(
     image: str = Field(description="The image to generate the video, must be a url"),
     prompt: str = Field(description="The prompt to generate the video, support Chinese and English"),
     quality: Literal["low", "high"] = Field("low", description="Video quality: 'low' for faster generation, 'high' for better quality"),
@@ -47,7 +47,7 @@ def i2v_by_local_wan_fusionx(
     # 根据宽高比和质量获取具体的宽高尺寸
     width, height = aspect_ratio.get_dimensions(quality)
     
-    result = execute_workflow("i2v_by_wan_fusionx.json", {
+    result = await execute_workflow(__file__, {
         "image": image,
         "prompt": prompt,
         "width": width,

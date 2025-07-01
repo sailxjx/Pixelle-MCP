@@ -1,0 +1,28 @@
+{
+  "1": {
+    "inputs": {
+      "text": "这是一段测试文本",
+      "voice": "zh-CN-YunxiNeural",
+      "speed": 1,
+      "pitch": 0
+    },
+    "class_type": "EdgeTTS",
+    "_meta": {
+      "title": "Edge TTS 🔊,$text.text,$voice.voice"
+    }
+  },
+  "3": {
+    "inputs": {
+      "filename_prefix": "audio/ComfyUI",
+      "quality": "V0",
+      "audio": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "SaveAudioMP3",
+    "_meta": {
+      "title": "Save Audio (MP3)"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "2": {
+    "inputs": {
+      "image": "51becc10279d43a3a2f6bec640c77240.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image,$image.image"
+    }
+  },
+  "4": {
+    "inputs": {
+      "prompt": "Change the background of the picture to the sea",
+      "aspect_ratio": "16:9",
+      "guidance": 3,
+      "steps": 50,
+      "seed": 908196617864053,
+      "prompt_upsampling": false,
+      "input_image": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "FluxKontextProImageNode",
+    "_meta": {
+      "title": "Flux.1 Kontext [pro] Image,$prompt.prompt,$aspect_ratio.aspect_ratio,$seed.seed"
+    }
+  },
+  "5": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

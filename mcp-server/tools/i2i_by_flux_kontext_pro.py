@@ -5,7 +5,7 @@ from utils.comfyui_util import execute_workflow
 from utils.image_util import detect_image_aspect_ratio
 
 @mcp_tool
-def i2i_by_flux_kontext_pro(
+async def i2i_by_flux_kontext_pro(
     image: str = Field(description="The image to generate the image, must be a url"),
     prompt: str = Field(description="The prompt to generate the image, must be english"),
 ):
@@ -30,7 +30,7 @@ def i2i_by_flux_kontext_pro(
     aspect_ratio = detect_image_aspect_ratio(image)
     
     seed = random.randint(0, 1000000)
-    result = execute_workflow("flux_kontext_pro.json", {
+    result = await execute_workflow(__file__, {
         "image": image,
         "prompt": prompt,
         "aspect_ratio": aspect_ratio,

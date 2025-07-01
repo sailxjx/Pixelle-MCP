@@ -5,7 +5,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def i2i_by_gpt4(
+async def i2i_by_gpt4(
     image: str = Field(description="The image to generate the image, must be a url"),
     prompt: str = Field(description="The prompt to generate the image, support all languages"),
     quality: Literal["low", "medium", "high"] = Field("medium", description="The quality of the image, must be one of the following: 'low', 'medium', 'high'"),
@@ -37,7 +37,7 @@ def i2i_by_gpt4(
     - "将背景换成樱花飞舞的春日场景"
     """
     seed = random.randint(0, 1000000)
-    result = execute_workflow("i2i_gpt4.json", {
+    result = await execute_workflow(__file__, {
         "image": image,
         "prompt": prompt,
         "seed": seed,

@@ -5,7 +5,7 @@ from utils.upload_util import upload
 from utils.file_util import download_files, create_temp_file
 
 @mcp_tool
-def i_crop(
+async def i_crop(
     image_url: str = Field(description="The URL of the image to crop"),
 ):
     """Crop image to center of original"""

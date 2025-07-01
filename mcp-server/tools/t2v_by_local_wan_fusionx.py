@@ -3,7 +3,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def t2v_by_local_wan_fusionx(
+async def t2v_by_local_wan_fusionx(
     prompt: str = Field(description="The prompt to generate the video, must be english"),
     width: int = Field(512, description="The width of the video"),
     height: int = Field(288, description="The height of the video"),
@@ -26,7 +26,7 @@ def t2v_by_local_wan_fusionx(
     6. Visual Style: Incorporate stylistic cues such as cinematic, vintage film look, shallow depth of field, or motion blur to give the video a unique, cohesive aesthetic.
     7. Time and Environmental Context: Include relevant context such as time of day (e.g., dawn, dusk), weather conditions (e.g., rain, fog), and setting (e.g., forest, city, coast) to enhance realism and immersion.
     """
-    result = execute_workflow("t2v_by_wan_fusionx.json", {
+    result = await execute_workflow(__file__, {
         "prompt": prompt,
         "width": width,
         "height": height,

@@ -1,0 +1,45 @@
+{
+  "1": {
+    "inputs": {
+      "prompt": "猫脱掉了毛衣，换上了T恤",
+      "negative_prompt": "",
+      "model_name": "kling-v1-6",
+      "cfg_scale": 0.8,
+      "mode": "std",
+      "aspect_ratio": "16:9",
+      "duration": "5",
+      "start_frame": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "KlingImage2VideoNode",
+    "_meta": {
+      "title": "Kling Image to Video,$prompt.prompt,$model_name.model_name,$mode.mode"
+    }
+  },
+  "3": {
+    "inputs": {
+      "image": "auto-workflow-gen-temp_2025-06-03_6321b72f95324bb489b0872dbf21c8c5_副本.jpeg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image,$image.image"
+    }
+  },
+  "4": {
+    "inputs": {
+      "filename_prefix": "video/ComfyUI",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "Save Video"
+    }
+  }
+}

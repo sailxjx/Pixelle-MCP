@@ -4,7 +4,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def i2v_by_kling_start_frame(
+async def i2v_by_kling_start_frame(
     image: str = Field(description="The image to generate the image, must be a url"),
     prompt: str = Field(description="The prompt to generate the image, support Chinese and English"),
     model_name: Optional[Literal["kling-v1", "kling-v1-5", "kling-v1-6", "kling-v2-master"]] = Field("kling-v1-6", description="The model name, must be one of the following: 'kling-v1', 'kling-v1-5', 'kling-v1-6', 'kling-v2-master'"),
@@ -28,7 +28,7 @@ def i2v_by_kling_start_frame(
     - "Camera slowly zooms in while the person smiles and waves"
     - "Wind gently blows through hair as the character looks into distance"
     """
-    result = execute_workflow("i2v_kling_start_frame.json", {
+    result = await execute_workflow(__file__, {
         "image": image,
         "prompt": prompt,
         "model_name": model_name,

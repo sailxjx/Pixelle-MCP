@@ -3,7 +3,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def t2s_by_index_tts(
+async def t2s_by_index_tts(
     text: str = Field(description="The text to generate the audio"),
     # voice: Optional[str] = Field("default", description="The voice of the audio"),
 ):
@@ -13,7 +13,7 @@ def t2s_by_index_tts(
     Examples:
     - "你好，我是小明，很高兴认识你"
     """
-    result = execute_workflow("t2s_by_index_tts.json", {
+    result = await execute_workflow(__file__, {
         "text": text,
         # "voice": voice,
     })

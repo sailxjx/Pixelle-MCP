@@ -1,0 +1,60 @@
+{
+  "6": {
+    "inputs": {
+      "image": "06.JPG"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image,$image.image"
+    }
+  },
+  "10": {
+    "inputs": {
+      "model": "microsoft/Florence-2-large",
+      "precision": "fp16",
+      "attention": "sdpa"
+    },
+    "class_type": "DownloadAndLoadFlorence2Model",
+    "_meta": {
+      "title": "DownloadAndLoadFlorence2Model"
+    }
+  },
+  "11": {
+    "inputs": {
+      "text_input": "",
+      "task": "more_detailed_caption",
+      "fill_mask": true,
+      "keep_model_loaded": false,
+      "max_new_tokens": 1024,
+      "num_beams": 3,
+      "do_sample": true,
+      "output_mask_select": "",
+      "seed": 1098631327477633,
+      "image": [
+        "6",
+        0
+      ],
+      "florence2_model": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "Florence2Run",
+    "_meta": {
+      "title": "Florence2Run"
+    }
+  },
+  "18": {
+    "inputs": {
+      "text": "The image shows a white cat sitting on a black and white striped stool against a white wall. The cat is wearing a blue sweater with a ribbed pattern and is looking directly at the camera with a curious expression. Its ears are perked up and its eyes are wide open, giving it an alert and inquisitive look.",
+      "anything": [
+        "11",
+        2
+      ]
+    },
+    "class_type": "easy showAnything",
+    "_meta": {
+      "title": "Show Any"
+    }
+  }
+}

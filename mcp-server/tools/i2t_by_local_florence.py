@@ -3,7 +3,7 @@ from core import mcp_tool
 from utils.comfyui_util import execute_workflow
 
 @mcp_tool
-def i2t_by_local_florence(
+async def i2t_by_local_florence(
     image: str = Field(description="The image to generate the text, must be a url"),
 ):
     """
@@ -21,7 +21,7 @@ def i2t_by_local_florence(
        - In this case, combine tool output with conversation context to give users contextually appropriate natural responses
        - Don't return raw output directly, but provide targeted replies based on understanding results
     """
-    result = execute_workflow("i2t_by_local_florence.json", {
+    result = await execute_workflow(__file__, {
         "image": image,
     })
     return result.to_llm_result() 
