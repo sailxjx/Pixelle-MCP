@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import re
 import uuid
+import asyncio
+import random
 
 ReplyHandler = Callable[[cl.Message], Awaitable[None]]
 
@@ -392,12 +394,12 @@ async def on_save_starter(action):
             await cancel_callback()
         await show_alert("error", "操作失败", str(e))
 
-async def handle_preset_response(preset_response: List[Dict[str, Any]]) -> None:
+async def handle_messages(messages: List[Dict[str, Any]]) -> None:
     """处理预置回答数组"""
-    if not preset_response:
+    if not messages:
         return
     
-    for item in preset_response:
+    for item in messages:
         role = item.get("role", "ai")
         item_type = item.get("type", "message")
         
@@ -414,7 +416,31 @@ async def handle_step_item(item: Dict[str, Any]) -> None:
     
     async with cl.Step(name=step_name) as step:
         step.input = step_input
+        
+        delay = random.uniform(1.0, 3.0)
+        await asyncio.sleep(delay)
+        
         step.output = step_output
+
+async def stream_content_with_typing_effect(content: str, delay_per_char: float = 0.02, message_type: str = "assistant_message") -> cl.Message:
+    """使用打字机效果流式输出内容"""
+    if not content:
+        message = cl.Message(content="", type=message_type)
+        await message.send()
+        return message
+    
+    # 创建空消息，指定消息类型
+    message = cl.Message(content="", type=message_type)
+    
+    # 逐字符流式输出
+    for char in content:
+        await message.stream_token(char)
+        # 添加小延时使打字效果更自然
+        await asyncio.sleep(delay_per_char)
+    
+    # 完成流式输出
+    await message.send()
+    return message
 
 async def handle_message_item(item: Dict[str, Any], role: str) -> None:
     """处理消息项"""
@@ -435,22 +461,18 @@ async def handle_message_item(item: Dict[str, Any], role: str) -> None:
         elif elem_type == "audio" and elem_url:
             elements.append(cl.Audio(url=elem_url, size=elem_size))
     
-    # 根据角色发送不同类型的消息
+    # user 和 ai 消息都使用打字机效果
     if role == "user":
-        # 用户消息
-        message = cl.Message(
-            type="user_message", 
-            content=content, 
-            elements=elements
-        )
+        # 用户消息 - 使用打字机效果，速度稍快一些
+        message = await stream_content_with_typing_effect(content, delay_per_char=0.05, message_type="user_message")
     else:
-        # AI助手消息
-        message = cl.Message(
-            content=content, 
-            elements=elements
-        )
+        # AI助手消息 - 使用打字机效果，正常速度
+        message = await stream_content_with_typing_effect(content, delay_per_char=0.02, message_type="assistant_message")
     
-    await message.send()
+    # content 输出完成后，一次性添加 elements
+    if elements:
+        message.elements = elements
+        await message.update()
 
 @cl.set_starters
 async def set_starters():
@@ -505,7 +527,7 @@ async def hook_by_starters(message: cl.Message):
         
         # 处理消息，跳过第一个用户消息（已经发送过了）
         if starter.messages and len(starter.messages) > 1:
-            await handle_preset_response(starter.messages[1:])
+            await handle_messages(starter.messages[1:])
             return True
         # 其次使用传统的 reply_handler（向后兼容）
         elif starter.reply_handler:
