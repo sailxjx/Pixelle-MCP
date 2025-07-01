@@ -49,7 +49,7 @@ services:
     ports:
       - "9002:9002"
     volumes:
-      - ./mcp-server/data:/data
+      - ./mcp-server/data:/app/data
     env_file:
       - ./mcp-server/.env
       - ./mcp-server/.env.local
@@ -72,7 +72,7 @@ services:
     ports:
       - "9003:9003"
     volumes:
-      - ./mcp-client/data:/data
+      - ./mcp-client/data:/app/data
     env_file:
       - ./mcp-client/.env
       - ./mcp-client/.env.local
