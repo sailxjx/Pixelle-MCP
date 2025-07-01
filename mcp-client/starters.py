@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import json
 from pathlib import Path
 import re
+import uuid
 
 ReplyHandler = Callable[[cl.Message], Awaitable[None]]
 
@@ -29,11 +30,21 @@ class StarterModel(BaseModel):
         )
 
 # 文件操作相关函数
-STARTERS_DIR = Path("./starters")
+SYSTEM_STARTERS_DIR = Path("./starters")
+CUSTOM_STARTERS_DIR = Path("./data/custom_starters")
 
-def ensure_starters_dir():
-    """确保 starters 目录存在"""
-    STARTERS_DIR.mkdir(parents=True, exist_ok=True)
+def ensure_starters_dirs():
+    """确保系统和用户 starters 目录都存在"""
+    SYSTEM_STARTERS_DIR.mkdir(parents=True, exist_ok=True)
+    CUSTOM_STARTERS_DIR.mkdir(parents=True, exist_ok=True)
+
+def get_system_starters_dir() -> Path:
+    """获取系统预置starter目录"""
+    return SYSTEM_STARTERS_DIR
+
+def get_custom_starters_dir() -> Path:
+    """获取用户自定义starter目录"""
+    return CUSTOM_STARTERS_DIR
 
 def parse_filename(filename: str) -> Tuple[bool, int, str]:
     """
@@ -59,6 +70,19 @@ def parse_filename(filename: str) -> Tuple[bool, int, str]:
         # 如果不匹配格式，返回默认值
         return enabled, 999, name
 
+def get_next_order_number() -> int:
+    """获取用户目录下一个排序号"""
+    ensure_starters_dirs()
+    max_order = 0
+    
+    # 只考虑用户自定义目录的排序号
+    for starter_file in CUSTOM_STARTERS_DIR.glob("*.json"):
+        _, order, _ = parse_filename(starter_file.name)
+        if order != 999:  # 忽略默认值
+            max_order = max(max_order, order)
+    
+    return max_order + 1
+
 def load_custom_starter(starter_file: Path) -> Optional[StarterModel]:
     """从文件加载单个自定义 starter"""
     try:
@@ -81,12 +105,27 @@ def load_custom_starter(starter_file: Path) -> Optional[StarterModel]:
         print(f"Error loading starter from {starter_file}: {e}")
         return None
 
+def load_system_starters() -> List[StarterModel]:
+    """加载系统预置 starters"""
+    ensure_starters_dirs()
+    system_starters = []
+    
+    for starter_file in SYSTEM_STARTERS_DIR.glob("*.json"):
+        starter = load_custom_starter(starter_file)
+        if starter and starter.enabled:  # 只加载启用的starters
+            system_starters.append(starter)
+    
+    # 按order字段排序
+    system_starters.sort(key=lambda x: x.order)
+    
+    return system_starters
+
 def load_custom_starters() -> List[StarterModel]:
-    """加载所有自定义 starters，按文件名排序"""
-    ensure_starters_dir()
+    """加载用户自定义 starters"""
+    ensure_starters_dirs()
     custom_starters = []
     
-    for starter_file in STARTERS_DIR.glob("*.json"):
+    for starter_file in CUSTOM_STARTERS_DIR.glob("*.json"):
         starter = load_custom_starter(starter_file)
         if starter and starter.enabled:  # 只加载启用的starters
             custom_starters.append(starter)
@@ -97,8 +136,266 @@ def load_custom_starters() -> List[StarterModel]:
     return custom_starters
 
 def get_all_starters() -> List[StarterModel]:
-    """获取所有启用的 starters，按文件名顺序排列"""
-    return load_custom_starters()
+    """获取所有启用的 starters，系统预置在前，用户自定义在后"""
+    system_starters = load_system_starters()
+    custom_starters = load_custom_starters()
+    
+    # 系统预置在前，用户自定义在后
+    return system_starters + custom_starters
+
+def convert_message_to_dict(message: cl.Message) -> Dict[str, Any]:
+    """将 cl.Message 转换为字典格式"""
+    message_dict = {
+        "role": "user" if message.type == "user_message" else "ai",
+        "type": "message",
+        "content": message.content,
+    }
+    
+    # 处理元素
+    if message.elements:
+        elements = []
+        for element in message.elements:
+            if isinstance(element, cl.Image):
+                elements.append({
+                    "type": "image",
+                    "url": element.url,
+                    "size": getattr(element, 'size', 'small')
+                })
+            elif isinstance(element, cl.Video):
+                elements.append({
+                    "type": "video",
+                    "url": element.url,
+                    "size": getattr(element, 'size', 'small')
+                })
+            elif isinstance(element, cl.Audio):
+                elements.append({
+                    "type": "audio",
+                    "url": element.url,
+                    "size": getattr(element, 'size', 'small')
+                })
+        
+        if elements:
+            message_dict["elements"] = elements
+    
+    return message_dict
+
+def convert_step_to_dict(step: cl.Step) -> Dict[str, Any]:
+    """将 cl.Step 转换为字典格式"""
+    return {
+        "role": "ai",
+        "type": "step",
+        "name": step.name,
+        "input": step.input if step.input else {},
+        "output": step.output if step.output else ""
+    }
+
+async def save_conversation_as_starter(label: str, user_message: str) -> bool:
+    """保存当前对话为 starter"""
+    try:
+        ensure_starters_dirs()
+        
+        # 获取对话历史
+        chat_context = cl.chat_context.get()
+        if not chat_context:
+            return False
+        
+        # 构建预置回答
+        preset_response = []
+        
+        # 跳过第一条用户消息（这将成为 starter 的 message）和系统消息
+        messages_to_process = []
+        found_first_user_message = False
+        
+        for item in chat_context:
+            if isinstance(item, cl.Message):
+                if not item.content and not item.elements:
+                    continue
+                if item.type == "system_message":
+                    continue  # 跳过系统消息
+                elif item.type == "user_message":
+                    if not found_first_user_message:
+                        found_first_user_message = True
+                        continue  # 跳过第一条用户消息
+                    else:
+                        messages_to_process.append(item)  # 保留后续用户消息
+                else:
+                    messages_to_process.append(item)  # 保留AI回复
+            elif isinstance(item, cl.Step):
+                messages_to_process.append(item)  # 保留所有Steps
+        
+        # 转换为预置回答格式
+        for item in messages_to_process:
+            if isinstance(item, cl.Message):
+                preset_response.append(convert_message_to_dict(item))
+            elif isinstance(item, cl.Step):
+                preset_response.append(convert_step_to_dict(item))
+        
+        # 创建 starter 数据
+        starter_data = {
+            "message": user_message,
+            "icon": "/public/tool.svg",
+            "preset_response": preset_response
+        }
+        
+        # 生成文件名
+        order = get_next_order_number()
+        filename = f"{order:03d}_{label}.json"
+        filepath = CUSTOM_STARTERS_DIR / filename
+        
+        # 保存文件
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(starter_data, f, ensure_ascii=False, indent=2)
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error saving starter: {e}")
+        return False
+
+def build_save_action():
+    return cl.Action(
+        name="save_as_starter", 
+        payload={"value": "save_starter"}, 
+        icon="save"
+    )
+
+async def show_prompt_dialog(title: str, message: str, placeholder: str = ""):
+    """显示自定义prompt对话框，返回(dialog_id, cancel_callback)"""
+    dialog_id = str(uuid.uuid4())
+    
+    # 创建自定义元素
+    prompt_element = cl.CustomElement(
+        name="PromptDialog",
+        props={
+            "open": True,
+            "title": title,
+            "message": message,
+            "placeholder": placeholder,
+            "dialogId": dialog_id
+        }
+    )
+    
+    # 发送对话框
+    prompt_msg = cl.Message(content="", elements=[prompt_element])
+    await prompt_msg.send()
+    
+    # 将对话框信息存储到用户会话中
+    cl.user_session.set(f"prompt_dialog_{dialog_id}", {
+        "message": prompt_msg,
+        "resolved": False,
+        "result": None
+    })
+    
+    # 定义取消回调函数
+    async def cancel_callback():
+        """清理prompt对话框相关资源"""
+        try:
+            await prompt_msg.remove()
+            # cl.chat_context.remove(prompt_msg)
+            cl.user_session.set(f"prompt_dialog_{dialog_id}", None)
+        except Exception:
+            pass  # 清理失败时忽略
+    
+    return dialog_id, cancel_callback
+
+async def show_alert(alert_type: str, title: str, message: str):
+    """显示alert对话框"""
+    alert_element = cl.CustomElement(
+        name="AlertDialog",
+        props={
+            "open": True,
+            "type": alert_type,
+            "title": title,
+            "message": message
+        }
+    )
+    
+    # 发送alert
+    alert_msg = cl.Message(content="", elements=[alert_element])
+    await alert_msg.send()
+
+@cl.action_callback("prompt_confirmed")
+async def on_prompt_confirmed(action):
+    """处理用户确认输入"""
+    dialog_id = action.payload.get("dialogId")
+    value = action.payload.get("value", "").strip()
+    
+    if dialog_id:
+        dialog_info = cl.user_session.get(f"prompt_dialog_{dialog_id}")
+        if dialog_info:
+            dialog_info["resolved"] = True
+            dialog_info["result"] = value
+            cl.user_session.set(f"prompt_dialog_{dialog_id}", dialog_info)
+
+@cl.action_callback("save_as_starter")
+async def on_save_starter(action):
+    """处理保存为Starter的action"""
+    try:
+        # 获取对话历史
+        chat_context = cl.chat_context.get()
+        if not chat_context or len(chat_context) < 2:
+            await show_alert("error", "无法保存", "需要有对话内容才能保存为 Starter")
+            return
+        
+        # 获取第一条用户消息
+        first_user_message = None
+        for msg in chat_context:
+            if isinstance(msg, cl.Message) and msg.type == "user_message":
+                first_user_message = msg.content
+                break
+        
+        if not first_user_message:
+            await show_alert("error", "无法保存", "无法找到用户消息")
+            return
+        
+        # 显示自定义prompt对话框
+        dialog_id, cancel_callback = await show_prompt_dialog(
+            title="保存为 Starter",
+            message="请输入Starter的标签名（用于显示在首页）",
+            placeholder="如：图片编辑教程"
+        )
+        
+        # 等待用户输入（一直等待，无超时）
+        import asyncio
+        while True:
+            await asyncio.sleep(0.1)
+            dialog_info = cl.user_session.get(f"prompt_dialog_{dialog_id}")
+            if dialog_info and dialog_info.get("resolved"):
+                label = dialog_info.get("result")
+                break
+        
+        if not label:
+            # 用户取消，清理prompt消息
+            await cancel_callback()
+            return
+        
+        # 验证标签名
+        import re
+        if not re.match(r'^[\w\u4e00-\u9fff\-_\s]+$', label):
+            # 输入无效，清理prompt消息
+            await cancel_callback()
+            await show_alert("warning", "输入无效", "标签名只能包含中英文、数字、下划线、横线和空格")
+            return
+        
+        # 保存完成后清理prompt消息
+        await cancel_callback()
+        
+        # 保存 starter
+        success = await save_conversation_as_starter(label, first_user_message)
+        
+        
+        if success:
+            await show_alert("success", "保存成功", f"已成功保存为 Starter：{label}")
+            # 移除action按钮
+            await action.remove()
+        else:
+            await show_alert("error", "保存失败", "请检查文件权限或联系管理员")
+            
+    except Exception as e:
+        # 异常时也要清理状态
+        if 'cancel_callback' in locals():
+            await cancel_callback()
+        await show_alert("error", "操作失败", str(e))
 
 async def handle_preset_response(preset_response: List[Dict[str, Any]]) -> None:
     """处理预置回答数组"""

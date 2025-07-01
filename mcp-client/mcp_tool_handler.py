@@ -8,6 +8,7 @@ from openai import AsyncOpenAI
 from mcp import ClientSession
 import re
 from httpx import Timeout
+from starters import build_save_action
 from time_util import format_duration
 
 # 严格的媒体显示系统指令
@@ -403,6 +404,10 @@ async def _handle_stream_response(client, api_params, enhanced_messages, message
                         # 处理媒体标记并发送消息
                         await _process_media_markers(msg)
                         if msg.content and msg.content.strip():
+                            # 在AI回复消息上直接添加保存Action
+                            msg.actions = [
+                                build_save_action()
+                            ]
                             await msg.send()
                         return messages, False  # 结束处理
                         
@@ -424,6 +429,10 @@ async def _handle_stream_response(client, api_params, enhanced_messages, message
     # 如果没有工具调用，处理媒体标记并发送消息
     if not has_tool_call:
         await _process_media_markers(msg)
+        # 在AI回复消息上直接添加保存Action
+        msg.actions = [
+            build_save_action()
+        ]
         await msg.send()
         return messages, False
     
@@ -499,3 +508,5 @@ async def handle_mcp_disconnect(name: str):
     if name in mcp_tools:
         del mcp_tools[name]
     cl.user_session.set("mcp_tools", mcp_tools) 
+
+ 
