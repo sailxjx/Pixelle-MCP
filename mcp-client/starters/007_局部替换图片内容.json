@@ -1,8 +1,11 @@
 {
-  "message": "给杯子毛绒的手臂、腿和简单的脸，杯子的主体不变，让他开心的微笑。",
   "icon": "/public/replace.svg",
-  "image": "http://30.150.44.149:9000/files/2e99efc5f5f14d8791fca740d01b4077.jpg",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "给杯子毛绒的手臂、腿和简单的脸，杯子的主体不变，让他开心的微笑。"
+    },
     {
       "role": "ai",
       "type": "message",

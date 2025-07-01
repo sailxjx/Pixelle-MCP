@@ -1,7 +1,11 @@
 {
-  "message": "写一首关于生命的意义的短视频脚本，然后转音频。",
   "icon": "/public/sound.svg",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "写一首关于生命的意义的短视频脚本，然后转音频。"
+    },
     {
       "role": "ai",
       "type": "message",

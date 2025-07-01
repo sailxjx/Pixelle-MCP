@@ -29,6 +29,17 @@ def i_crop(
                 
                 # 进行裁剪
                 cropped_img = img.crop((left, top, right, bottom))
+                
+                # 如果图片是RGBA模式，需要转换为RGB模式才能保存为JPEG
+                if cropped_img.mode == 'RGBA':
+                    # 创建白色背景
+                    background = Image.new('RGB', cropped_img.size, (255, 255, 255))
+                    # 将RGBA图片粘贴到白色背景上
+                    background.paste(cropped_img, mask=cropped_img.split()[-1])  # 使用alpha通道作为mask
+                    cropped_img = background
+                elif cropped_img.mode != 'RGB':
+                    # 其他模式也转换为RGB
+                    cropped_img = cropped_img.convert('RGB')
             
             # 创建临时文件保存裁剪后的图片（移出上一层嵌套）
             with create_temp_file('_cropped.jpg') as cropped_output_path:

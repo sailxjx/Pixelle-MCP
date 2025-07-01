@@ -1,8 +1,11 @@
 {
-  "message": "让图片里的人物摸了摸下巴，然后突然笑起来",
   "icon": "/public/video.svg",
-  "image": "http://30.150.44.149:9000/files/7529378fc78347c4bc307b9eeb12a0c0.png",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "让图片里的人物摸了摸下巴，然后突然笑起来"
+    },
     {
       "role": "ai",
       "type": "message",

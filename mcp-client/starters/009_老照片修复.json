@@ -1,8 +1,11 @@
 {
-  "message": "给这张老照片上色",
   "icon": "/public/video.svg",
-  "image": "http://30.150.44.149:9000/files/9b21af9cf583477e8af3b42dcadd2fa0.png",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "给这张老照片上色"
+    },
     {
       "role": "ai",
       "type": "message",

@@ -1,8 +1,11 @@
 {
-  "message": "移除人物",
   "icon": "/public/remove-background.svg",
-  "image": "http://30.150.44.149:9000/files/eac6e8ac4b8a475ca10ef6dfbf836971.png",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "移除人物"
+    },
     {
       "role": "ai",
       "type": "message",

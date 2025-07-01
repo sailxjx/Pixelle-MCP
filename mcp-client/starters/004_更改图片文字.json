@@ -1,8 +1,11 @@
 {
-  "message": "把文字改为为\"PixelLab MCP\"",
   "icon": "/public/text.svg",
-  "image": "http://30.150.44.149:9000/files/5b4c8282374848cda1f7da3752756f7a.png",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "把文字改为为\"PixelLab MCP\""
+    },
     {
       "role": "ai",
       "type": "message",

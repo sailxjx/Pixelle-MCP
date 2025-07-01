@@ -10,16 +10,29 @@ ReplyHandler = Callable[[cl.Message], Awaitable[None]]
 
 class StarterModel(BaseModel):
     label: str
-    message: str
     icon: Optional[str] = None
     image: Optional[str] = None
     reply_handler: Optional[ReplyHandler] = None
-    preset_response: Optional[List[Dict[str, Any]]] = None
+    messages: Optional[List[Dict[str, Any]]] = None
     enabled: bool = True
     order: int = 999
     
     class Config:
         arbitrary_types_allowed = True
+    
+    @property
+    def message(self) -> str:
+        """从messages中获取用户消息内容"""
+        if not self.messages:
+            return ""
+        
+        # 查找第一个用户消息
+        for item in self.messages:
+            if (item.get("role") == "user" and 
+                item.get("type") == "message"):
+                return item.get("content", "")
+        
+        return ""
     
     def to_cl_starter(self) -> cl.Starter:
         """转换为Chainlit Starter对象"""
@@ -94,10 +107,9 @@ def load_custom_starter(starter_file: Path) -> Optional[StarterModel]:
         
         return StarterModel(
             label=expected_label,
-            message=data.get("message", ""),
             icon=data.get("icon", "/public/text.svg"),
             image=data.get("image", None),
-            preset_response=data.get("preset_response", None),
+            messages=data.get("messages", []),
             enabled=enabled,
             order=order,
         )
@@ -199,42 +211,25 @@ async def save_conversation_as_starter(label: str, user_message: str) -> bool:
         if not chat_context:
             return False
         
-        # 构建预置回答
-        preset_response = []
+        # 构建消息数组
+        messages = []
         
-        # 跳过第一条用户消息（这将成为 starter 的 message）和系统消息
-        messages_to_process = []
-        found_first_user_message = False
-        
+        # 处理所有对话内容，包括第一条用户消息
         for item in chat_context:
             if isinstance(item, cl.Message):
                 if not item.content and not item.elements:
                     continue
                 if item.type == "system_message":
                     continue  # 跳过系统消息
-                elif item.type == "user_message":
-                    if not found_first_user_message:
-                        found_first_user_message = True
-                        continue  # 跳过第一条用户消息
-                    else:
-                        messages_to_process.append(item)  # 保留后续用户消息
                 else:
-                    messages_to_process.append(item)  # 保留AI回复
+                    messages.append(convert_message_to_dict(item))
             elif isinstance(item, cl.Step):
-                messages_to_process.append(item)  # 保留所有Steps
+                messages.append(convert_step_to_dict(item))
         
-        # 转换为预置回答格式
-        for item in messages_to_process:
-            if isinstance(item, cl.Message):
-                preset_response.append(convert_message_to_dict(item))
-            elif isinstance(item, cl.Step):
-                preset_response.append(convert_step_to_dict(item))
-        
-        # 创建 starter 数据
+        # 创建 starter 数据（新格式）
         starter_data = {
-            "message": user_message,
             "icon": "/public/tool.svg",
-            "preset_response": preset_response
+            "messages": messages
         }
         
         # 生成文件名
@@ -337,7 +332,7 @@ async def on_save_starter(action):
             await show_alert("error", "无法保存", "需要有对话内容才能保存为 Starter")
             return
         
-        # 获取第一条用户消息
+        # 获取第一条用户消息的内容作为显示用
         first_user_message = None
         for msg in chat_context:
             if isinstance(msg, cl.Message) and msg.type == "user_message":
@@ -380,7 +375,7 @@ async def on_save_starter(action):
         # 保存完成后清理prompt消息
         await cancel_callback()
         
-        # 保存 starter
+        # 保存 starter（传入label即可，user_message参数已不再使用）
         success = await save_conversation_as_starter(label, first_user_message)
         
         
@@ -473,20 +468,46 @@ async def hook_by_starters(message: cl.Message):
     
     # 严格匹配消息内容
     for starter in get_all_starters():
-        if message.content != starter.message:
+        # 从messages中获取第一个用户消息进行匹配
+        if not starter.messages:
             continue
-        if starter.image and not message.elements:
-            message.elements.append(cl.Image(
-                size="small",
-                url=starter.image
-            ))
+            
+        first_user_item = None
+        for item in starter.messages:
+            if (item.get("role") == "user" and 
+                item.get("type") == "message"):
+                first_user_item = item
+                break
+        
+        if not first_user_item:
+            continue
+            
+        starter_message = first_user_item.get("content", "")
+        if message.content != starter_message:
+            continue
+            
+        # 检查并处理starter中的图片元素
+        starter_elements = first_user_item.get("elements", [])
+        if starter_elements and not message.elements:
+            message.elements = []
+            for elem_data in starter_elements:
+                elem_type = elem_data.get("type", "")
+                elem_url = elem_data.get("url", "")
+                elem_size = elem_data.get("size", "small")
+                
+                if elem_type == "image" and elem_url:
+                    message.elements.append(cl.Image(url=elem_url, size=elem_size))
+                elif elem_type == "video" and elem_url:
+                    message.elements.append(cl.Video(url=elem_url, size=elem_size))
+                elif elem_type == "audio" and elem_url:
+                    message.elements.append(cl.Audio(url=elem_url, size=elem_size))
             await message.update()
         
-        # 优先使用预置回答
-        if starter.preset_response:
-            await handle_preset_response(starter.preset_response)
+        # 处理消息，跳过第一个用户消息（已经发送过了）
+        if starter.messages and len(starter.messages) > 1:
+            await handle_preset_response(starter.messages[1:])
             return True
-        # 其次使用传统的 reply_handler
+        # 其次使用传统的 reply_handler（向后兼容）
         elif starter.reply_handler:
             await starter.reply_handler(starter)
             return True

@@ -1,7 +1,11 @@
 {
-  "message": "生成一个小狗的图片，然后再给图片加上\"Pawtist\"的标题，然后再做一个让这个小狗跳跃的视频，然后再生成一段描述文字，并转语音",
   "icon": "/public/video.svg",
-  "preset_response": [
+  "messages": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "生成一个小狗的图片，然后再给图片加上\"Pawtist\"的标题，然后再做一个让这个小狗跳跃的视频，然后再生成一段描述文字，并转语音"
+    },
     {
       "role": "ai",
       "type": "step",
