@@ -16,8 +16,8 @@ OPTIONAL_MODELS = [
 @mcp_tool
 async def i2t_by_gpt(
     image: str = Field(description="The image to analyze, must be a url"),
-    prompt: str = Field("Describe the image", description="The prompt to analyze, DO NOT use this parameter, except for user's special request"),
-    model: str = Field(OPTIONAL_MODELS[0], description="The model to use, must be one of the following: " + ", ".join(OPTIONAL_MODELS) + ", DO NOT use this parameter, except for user's special request"),
+    prompt: str = Field("Describe the image detailedly", description="The prompt to analyze"),
+    model: str = Field(OPTIONAL_MODELS[0], description="The model to use, must be one of the following: " + ", ".join(OPTIONAL_MODELS)),
 ):
     """
     Analyze image using OpenAI's GPT model.
