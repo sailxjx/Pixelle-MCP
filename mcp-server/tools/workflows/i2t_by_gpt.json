@@ -1,0 +1,38 @@
+{
+  "1": {
+    "inputs": {
+      "prompt": "描述这张图片",
+      "persist_context": false,
+      "model": "gpt-4.1-mini",
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "OpenAIChatNode",
+    "_meta": {
+      "title": "OpenAI Chat,$prompt.prompt,$model.model"
+    }
+  },
+  "2": {
+    "inputs": {
+      "image": "有问题的图.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image,$image.image"
+    }
+  },
+  "3": {
+    "inputs": {
+      "anything": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "easy showAnything",
+    "_meta": {
+      "title": "Show Any"
+    }
+  }
+}

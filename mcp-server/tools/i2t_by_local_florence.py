@@ -4,7 +4,7 @@ from utils.comfyui_util import execute_workflow
 
 @mcp_tool
 async def i2t_by_local_florence(
-    image: str = Field(description="The image to generate the text, must be a url"),
+    image: str = Field(description="The image to analyze, must be a url"),
 ):
     """
     Generate high-quality text descriptions from images using local Florence model.
