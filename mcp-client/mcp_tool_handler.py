@@ -100,12 +100,20 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
     current_step.name = tool_name
     await current_step.update()
     
+    def record_step():
+        # 获取现有的消息历史
+        current_steps = cl.user_session.get("current_steps", [])
+        current_steps.append(current_step)
+        # 更新消息历史
+        cl.user_session.set("current_steps", current_steps)
+    
     # 查找工具所属的连接
     mcp_name = find_tool_connection(tool_name)
     if not mcp_name:
         error_msg = json.dumps({"error": f"Tool {tool_name} not found in any MCP connection"})
         result_with_duration = _format_result_with_duration(error_msg)
         current_step.output = result_with_duration
+        record_step()
         return result_with_duration
     
     # 获取 MCP 会话
@@ -114,6 +122,7 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
         error_msg = json.dumps({"error": f"MCP {mcp_name} not found in any MCP connection"})
         result_with_duration = _format_result_with_duration(error_msg)
         current_step.output = result_with_duration
+        record_step()
         return result_with_duration
     
     try:
@@ -135,6 +144,7 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
         logger.info(f"Tool execution succeeded: {content}")
         result_with_duration = _format_result_with_duration(str(content))
         current_step.output = result_with_duration
+        record_step()
         return result_with_duration
         
     except Exception as e:
@@ -142,6 +152,7 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
         error_msg = json.dumps({"error": str(e)})
         result_with_duration = _format_result_with_duration(error_msg)
         current_step.output = result_with_duration
+        record_step()
         return result_with_duration
 
 

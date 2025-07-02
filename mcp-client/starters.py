@@ -160,6 +160,7 @@ def get_all_starters() -> List[StarterModel]:
 def convert_message_to_dict(message: cl.Message) -> Dict[str, Any]:
     """将 cl.Message 转换为字典格式"""
     message_dict = {
+        "created_at": message.created_at,
         "role": "user" if message.type == "user_message" else "ai",
         "type": "message",
         "content": message.content,
@@ -196,6 +197,7 @@ def convert_message_to_dict(message: cl.Message) -> Dict[str, Any]:
 def convert_step_to_dict(step: cl.Step) -> Dict[str, Any]:
     """将 cl.Step 转换为字典格式"""
     return {
+        "created_at": step.created_at,
         "role": "ai",
         "type": "step",
         "name": step.name,
@@ -210,28 +212,31 @@ async def save_conversation_as_starter(label: str, user_message: str) -> bool:
         
         # 获取对话历史
         chat_context = cl.chat_context.get()
-        if not chat_context:
-            return False
-        
         # 构建消息数组
-        messages = []
-        
-        # 处理所有对话内容，包括第一条用户消息
+        pure_messages = []
         for item in chat_context:
-            if isinstance(item, cl.Message):
-                if not item.content and not item.elements:
-                    continue
-                if item.type == "system_message":
-                    continue  # 跳过系统消息
-                else:
-                    messages.append(convert_message_to_dict(item))
-            elif isinstance(item, cl.Step):
-                messages.append(convert_step_to_dict(item))
+            if not item.content and not item.elements:
+                continue
+            if item.type == "system_message":
+                continue
+            else:
+                pure_messages.append(convert_message_to_dict(item))
         
-        # 创建 starter 数据（新格式）
+        
+        
+        # 从 user_session 获取 steps
+        current_steps = cl.user_session.get("current_steps", [])
+        step_messages = []
+        for step in current_steps:
+            step_messages.append(convert_step_to_dict(step))
+            
+        all_messages = pure_messages + step_messages
+        all_messages.sort(key=lambda x: x.get("created_at", ""))
+        
+        # 创建 starter 数据
         starter_data = {
             "icon": "/public/tool.svg",
-            "messages": messages
+            "messages": all_messages
         }
         
         # 生成文件名
