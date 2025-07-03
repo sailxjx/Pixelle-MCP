@@ -466,6 +466,25 @@ async def process_streaming_response(
     Returns:
         更新后的消息历史
     """
+    
+    # 清理steps，针对用户重新编辑已发送消息的场景做处理
+    chat_messages = cl.chat_context.get()
+    if len(chat_messages) >= 2:  # 至少有2条消息才需要处理
+        # 获取倒数第二条消息的时间戳
+        second_last_msg = chat_messages[-2]
+        second_last_time = second_last_msg.created_at
+        
+        if second_last_time:
+            # 获取当前steps
+            current_steps = cl.user_session.get("current_steps", [])
+            # 只保留时间戳在倒数第二条消息之前的steps
+            filtered_steps = [
+                step for step in current_steps 
+                if str(step.created_at) <= second_last_time
+            ]
+            # 更新steps
+            cl.user_session.set("current_steps", filtered_steps)
+    
     tools = get_all_tools()
     
     # 注入媒体显示系统指令
