@@ -79,6 +79,7 @@ services:
       - "9003:9003"
     volumes:
       - ./mcp-client/data:/app/data
+      - ./mcp-client/.files:/app/.files
     env_file:
       - ./mcp-client/.env
       - ./mcp-client/.env.local
