@@ -60,8 +60,8 @@ redeploy.sh
 .pytest_cache/
 
 # 文档
-README.md
-*.md
+# README.md (需要用于构建，不能忽略)
+# *.md (其他md文件暂时也不忽略，避免构建问题)
 
 # 其他
 .cursorrules
