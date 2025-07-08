@@ -15,6 +15,7 @@ import tempfile
 import mimetypes
 from urllib.parse import urlparse
 from utils.os_util import get_root_path
+from utils.workflow_parser import WorkflowParser, WorkflowMetadata  # 新增导入
 from typing import Any, Optional, Dict, List, Tuple
 from pydantic import BaseModel, Field
 
@@ -158,32 +159,24 @@ async def _load_workflow_from_url(url: str) -> Dict[str, Any]:
                 raise Exception(f"解析工作流JSON失败: {e}")
 
 
-def _is_valid_node(node_data: Any) -> bool:
-    """检查节点是否有效并包含标题"""
-    return (isinstance(node_data, dict) and 
-            "_meta" in node_data and 
-            "title" in node_data["_meta"])
-
-
-async def _process_param_marker(node_data: Dict[str, Any], var_spec: str, params: Dict[str, Any]):
-    """处理参数标记"""
-    # 必须有字段分隔符
-    if '.' not in var_spec:
-        logger.warning(f"参数标记格式错误，应为 '$param.field': {var_spec}")
-        return
-        
-    # 解析参数名和字段名
-    var_name, input_field = var_spec.split('.', 1)
+async def _apply_param_mapping(workflow_data: Dict[str, Any], mapping: Any, param_value: Any):
+    """根据参数映射应用单个参数"""
+    node_id = mapping.node_id
+    input_field = mapping.input_field
+    node_class_type = mapping.node_class_type
     
-    # 检查参数是否存在
-    if var_name not in params:
+    # 检查节点是否存在
+    if node_id not in workflow_data:
+        logger.warning(f"节点 {node_id} 不存在于工作流中")
         return
-        
-    # 获取参数值
-    param_value = params[var_name]
+    
+    node_data = workflow_data[node_id]
+    
+    # 确保inputs存在
+    if "inputs" not in node_data:
+        node_data["inputs"] = {}
     
     # 检查节点类型是否需要特殊媒体上传处理
-    node_class_type = node_data.get('class_type')
     if node_class_type in MEDIA_UPLOAD_NODE_TYPES:
         await _handle_media_upload(node_data, input_field, param_value)
     else:
@@ -285,67 +278,36 @@ async def _upload_media(media_path: str) -> str:
             return result.get('name', '')
 
 
-async def _process_node_params(node_data: Dict[str, Any], params: Dict[str, Any]):
-    """处理节点中的参数标记"""
-    title = node_data["_meta"]["title"]
+async def _apply_params_to_workflow_v2(workflow_data: Dict[str, Any], metadata: WorkflowMetadata, params: Dict[str, Any]) -> Dict[str, Any]:
+    """使用新解析器将参数应用到工作流"""
+    workflow_data = copy.deepcopy(workflow_data)
     
-    # 分割标题并查找参数标记
-    parts = title.split(',')
-    for part in parts:
-        part = part.strip()
-        if not part.startswith('$'):
-            continue
-            
-        # 处理参数标记
-        await _process_param_marker(node_data, part[1:], params)
-
-
-async def _apply_params_to_workflow(workflow: Dict[str, Any], params: Dict[str, Any]) -> Dict[str, Any]:
-    """将参数应用到工作流"""
-    workflow = copy.deepcopy(workflow)
+    # 遍历所有参数映射
+    for mapping in metadata.mapping_info.param_mappings:
+        param_name = mapping.param_name
+        
+        # 检查参数是否存在
+        if param_name in params:
+            param_value = params[param_name]
+            await _apply_param_mapping(workflow_data, mapping, param_value)
+        else:
+            # 使用默认值（如果存在）
+            if param_name in metadata.params:
+                param_info = metadata.params[param_name]
+                if param_info.default is not None:
+                    await _apply_param_mapping(workflow_data, mapping, param_info.default)
+                elif param_info.required:
+                    raise Exception(f"必填参数 '{param_name}' 缺失")
     
-    for node_id, node_data in workflow.items():
-        # 跳过不满足条件的节点
-        if not _is_valid_node(node_data):
-            continue
-            
-        # 处理节点中的参数
-        await _process_node_params(node_data, params)
-    
-    return workflow
+    return workflow_data
 
 
-async def _extract_output_nodes(workflow: Dict[str, Any]) -> Dict[str, str]:
-    """提取输出节点及其输出变量名"""
+def _extract_output_nodes_v2(metadata: WorkflowMetadata) -> Dict[str, str]:
+    """从元数据提取输出节点及其输出变量名"""
     output_id_2_var = {}
     
-    for node_id, node_data in workflow.items():
-        # 跳过不满足条件的节点
-        if not _is_valid_node(node_data):
-            continue
-            
-        # 获取节点标题
-        title = node_data["_meta"]["title"]
-        
-        # 检查标题中的$output标记
-        output_var = None
-        parts = title.split(',')
-        for part in parts:
-            part = part.strip()
-            if part.startswith('$output'):
-                # 解析输出标记
-                if '.' in part:
-                    # 格式: $output.name - 指定输出名称
-                    output_var = part.split('.', 1)[1]
-                    if not output_var:
-                        raise Exception(f"无效的输出标记格式 (空名称): {part}")
-                else:
-                    # 简单的$output没有变量名是无效的
-                    raise Exception(f"无效的输出标记格式 (缺少名称): {part}. 请使用 $output.name 格式.")
-        
-        # 只有显式输出标记才注册到output_id_2_var
-        if output_var:
-            output_id_2_var[node_id] = output_var
+    for output_mapping in metadata.mapping_info.output_mappings:
+        output_id_2_var[output_mapping.node_id] = output_mapping.output_var
     
     return output_id_2_var
 
@@ -544,23 +506,57 @@ async def _wait_for_results(prompt_id: str, timeout: Optional[int] = None, outpu
 
 
 async def execute_workflow(workflow: str, params: Dict[str, Any] = None) -> ExecuteResult:
-    """异步执行工作流"""
+    """异步执行工作流（向后兼容版本）"""
     try:
-        # 支持工作流作为本地路径或URL
+        # 如果是URL，暂时不支持新解析器
         if workflow.startswith('http://') or workflow.startswith('https://'):
-            workflow_data = await _load_workflow_from_url(workflow)
+            return ExecuteResult(status="error", msg="URL工作流暂不支持，请使用本地文件")
+        
+        # 尝试使用新解析器
+        try:
+            return await execute_workflow_v2(workflow, params)
+        except Exception as e:
+            logger.warning(f"新解析器失败，原因: {e}")
+            return ExecuteResult(status="error", msg=f"工作流解析失败: {str(e)}")
+        
+    except Exception as e:
+        logger.error(f"执行工作流出错: {str(e)}", exc_info=True)
+        return ExecuteResult(status="error", msg=str(e))
+
+def get_workflow_metadata(workflow_file: str) -> Optional[WorkflowMetadata]:
+    """获取工作流元数据（使用新的解析器）"""
+    parser = WorkflowParser()
+    return parser.parse_workflow_file(workflow_file)
+
+async def execute_workflow_v2(workflow_file: str, params: Dict[str, Any] = None) -> ExecuteResult:
+    """使用新解析器执行工作流"""
+    try:
+        # 获取工作流元数据
+        metadata = get_workflow_metadata(workflow_file)
+        if not metadata:
+            return ExecuteResult(status="error", msg="无法解析工作流元数据")
+        
+        # 加载工作流JSON
+        if os.path.exists(workflow_file):
+            # 直接使用完整路径
+            with open(workflow_file, 'r', encoding='utf-8') as f:
+                workflow_data = json.load(f)
         else:
-            workflow_data = _load_workflow_from_local(workflow)
+            # 尝试从tools/workflows目录加载
+            workflow_data = _load_workflow_from_local(workflow_file)
         
         if not workflow_data:
             return ExecuteResult(status="error", msg="工作流数据缺失")
         
-        # 处理工作流参数
+        # 使用新的参数映射逻辑
         if params:
-            workflow_data = await _apply_params_to_workflow(workflow_data, params)
+            workflow_data = await _apply_params_to_workflow_v2(workflow_data, metadata, params)
+        else:
+            # 即使没有传入参数，也需要应用默认值
+            workflow_data = await _apply_params_to_workflow_v2(workflow_data, metadata, {})
         
-        # 提取和保存输出节点信息
-        output_id_2_var = await _extract_output_nodes(workflow_data)
+        # 从元数据提取输出节点信息
+        output_id_2_var = _extract_output_nodes_v2(metadata)
         
         # 生成客户端ID
         client_id = str(uuid.uuid4())
@@ -595,9 +591,22 @@ async def execute_workflow(workflow: str, params: Dict[str, Any] = None) -> Exec
         logger.error(f"执行工作流出错: {str(e)}", exc_info=True)
         return ExecuteResult(status="error", msg=str(e))
 
+
 if __name__ == "__main__":
-    # 测试代码
-    result = asyncio.run(execute_workflow("t2i_by_local_flux.json", {
-        "prompt": "a cute girl",
-    }))
-    print(result.model_dump_json(indent=2)) 
+    import asyncio
+    
+    async def test_dreamshaper_workflow():
+        # 首先解析工作流元数据
+        workflow_file = "data/custom_workflows/test_t2v_by_dreamshaper.json"
+        
+        # 执行工作流
+        print("⏳ 正在执行工作流...")
+        result = await execute_workflow_v2(workflow_file, {
+            "prompt": "a beautiful anime girl with blue hair, masterpiece, high quality",
+            "width": 768,
+            "height": 512
+        })
+        
+        print(f"✅ 执行完成! 状态: {result.model_dump_json(indent=2)}")
+    # 运行测试
+    asyncio.run(test_dreamshaper_workflow())
