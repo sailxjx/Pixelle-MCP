@@ -99,9 +99,6 @@ class WorkflowManager:
     
     def _register_workflow(self, title: str, workflow_handler, metadata: WorkflowMetadata) -> None:
         """注册并记录工作流"""
-        # 如果已存在同名工作流，先移除
-        if title in self.loaded_workflows:
-            self.unload_workflow(title)
         
         # 注册为MCP工具
         mcp.tool(workflow_handler)

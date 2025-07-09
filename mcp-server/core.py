@@ -5,7 +5,10 @@ import logging
 import os
 
 # 初始化MCP服务器
-mcp = FastMCP("pixel-mcp")
+mcp = FastMCP(
+    name="pixel-mcp",
+    on_duplicate_tools="replace",
+)
 
 # 日志配置
 logger_level = logging.INFO
