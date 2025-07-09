@@ -72,10 +72,6 @@ class WorkflowManager:
     
     def _generate_workflow_function(self, title: str, params_str: str, workflow_path: Path) -> str:
         """生成工作流执行函数代码"""
-        # 从路径中提取文件名（不含扩展名）用于错误日志
-        workflow_name = Path(workflow_path).stem
-        
-        # 生成完整的函数定义
         return f'''async def {title}({params_str}):
     try:
         # 获取传入的参数（排除特殊参数）
@@ -91,7 +87,7 @@ class WorkflowManager:
             return f"工作流执行失败: {{result.msg or result.status}}"
             
     except Exception as e:
-        logger.error(f"工作流执行失败 {workflow_name}: {{e}}")
+        logger.error(f"工作流执行失败 {title}: {{e}}", exc_info=True)
         return f"工作流执行异常: {{str(e)}}"
 '''
     
@@ -200,12 +196,12 @@ class WorkflowManager:
             # 注册并记录工作流
             self._register_workflow(workflow_path, dynamic_function, metadata)
             
-            logger.info(f"工作流 '{workflow_path.stem}' 已成功加载为MCP工具")
+            logger.info(f"工作流 '{title}' 已成功加载为MCP工具")
             return {
                 "success": True,
-                "workflow": workflow_path.stem,
+                "workflow": title,
                 "metadata": metadata.model_dump(),
-                "message": f"工作流 '{workflow_path.stem}' 已成功加载"
+                "message": f"工作流 '{title}' 已成功加载为MCP工具"
             }
             
         except Exception as e:
