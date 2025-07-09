@@ -6,8 +6,6 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from pydantic import Field
 from core import mcp, logger
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 from utils.os_util import get_data_path
 from utils.workflow_parser import WorkflowParser, WorkflowMetadata
 from utils.comfyui_util import execute_workflow
@@ -21,18 +19,7 @@ class WorkflowManager:
     def __init__(self, workflows_dir: str = CUSTOM_WORKFLOW_DIR):
         self.workflows_dir = Path(workflows_dir)
         self.loaded_workflows = {}
-        self.setup_file_watcher()
-        
-    def setup_file_watcher(self):
-        """设置文件监听器"""
-        self.observer = Observer()
-        self.observer.schedule(
-            WorkflowEventHandler(self),
-            str(self.workflows_dir),
-            recursive=False
-        )
-        self.observer.start()
-        logger.info(f"开始监听工作流目录: {self.workflows_dir}")
+
     
     def parse_workflow_metadata(self, workflow_path: Path, tool_name: str = None) -> Optional[WorkflowMetadata]:
         """使用新的工作流解析器解析工作流元数据"""
@@ -161,22 +148,8 @@ class WorkflowManager:
                     "error": f"无法解析工作流元数据: {workflow_path}"
                 }
 
-            # 验证title格式
             title = metadata.title
             
-            # 防抖机制：检查是否在1秒内刚加载过同名工作流
-            if title in self.loaded_workflows:
-                last_loaded_at = self.loaded_workflows[title]["loaded_at"]
-                if isinstance(last_loaded_at, datetime):
-                    time_diff = (datetime.now() - last_loaded_at).total_seconds()
-                    if time_diff < 1.0:
-                        logger.debug(f"工作流 '{title}' 在1秒内刚加载过，跳过重复处理")
-                        return {
-                            "success": True,
-                            "workflow": title,
-                            "metadata": metadata.model_dump(),
-                            "message": f"工作流 '{title}' 已存在，跳过重复加载"
-                        }
             
             # 验证title格式
             if not re.match(r'^[a-zA-Z0-9_\.-]+$', title):
@@ -302,61 +275,33 @@ class WorkflowManager:
             }
         }
     
-    def cleanup(self):
-        """清理资源"""
-        if hasattr(self, 'observer'):
-            self.observer.stop()
-            self.observer.join()
+    def reload_all_workflows(self) -> Dict:
+        """手动重新加载所有工作流"""
+        logger.info("开始手动重新加载所有工作流")
+        
+        # 清除所有已加载的工作流
+        for workflow_name in list(self.loaded_workflows.keys()):
+            try:
+                mcp.remove_tool(workflow_name)
+            except:
+                pass  # 忽略移除失败的情况
+        
+        self.loaded_workflows.clear()
+        
+        # 重新加载所有工作流
+        results = self.load_all_workflows()
+        
+        logger.info(f"手动重新加载完成: 成功 {len(results['success'])}，失败 {len(results['failed'])}")
+        
+        return {
+            "success": True,
+            "message": f"重新加载完成: 成功 {len(results['success'])}，失败 {len(results['failed'])}",
+            "results": results
+        }
+    
 
-class WorkflowEventHandler(FileSystemEventHandler):
-    """工作流文件变化事件处理器"""
-    
-    def __init__(self, manager: WorkflowManager):
-        self.manager = manager
-        self._last_modified_time = {}
-    
-    def on_created(self, event):
-        if event.is_directory or not self._is_workflow_file(event.src_path):
-            return
-        
-        logger.info(f"检测到新工作流文件: {event.src_path}")
-        self.manager.load_workflow(Path(event.src_path))
-        
-    def on_moved(self, event):
-        if event.is_directory:
-            return
-        
-        logger.info(f"检测到工作流文件移动: {event.src_path} => {event.dest_path}")
-        if self._is_workflow_file(event.src_path):
-            self.manager.unload_workflow(Path(event.src_path).stem)
-        if self._is_workflow_file(event.dest_path):
-            self.manager.load_workflow(Path(event.dest_path))
-    
-    def on_modified(self, event):
-        if event.is_directory or not self._is_workflow_file(event.src_path):
-            return
-            
-        # 防止重复触发
-        current_time = time.time()
-        if event.src_path in self._last_modified_time:
-            if current_time - self._last_modified_time[event.src_path] < 1:  # 1秒内的修改忽略
-                return
-        self._last_modified_time[event.src_path] = current_time
-        
-        logger.info(f"检测到工作流文件修改: {event.src_path}")
-        self.manager.load_workflow(Path(event.src_path))
-    
-    def on_deleted(self, event):
-        if event.is_directory or not self._is_workflow_file(event.src_path):
-            return
-        
-        workflow_name = Path(event.src_path).stem
-        if workflow_name in self.manager.loaded_workflows:
-            logger.info(f"检测到工作流文件删除: {event.src_path}")
-            self.manager.unload_workflow(workflow_name)
-            
-    def _is_workflow_file(self, path: str) -> bool:
-        return path.endswith('.json')
+
+
 
 # 创建工作流管理器实例
 workflow_manager = WorkflowManager()
