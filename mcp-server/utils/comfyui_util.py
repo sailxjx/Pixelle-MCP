@@ -1,7 +1,6 @@
 import os
 import sys
 
-
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
@@ -125,25 +124,6 @@ def transfer_result_files(result: ExecuteResult) -> ExecuteResult:
             data[field] = data[field]
     
     return ExecuteResult(**data)
-
-
-def _load_workflow_from_local(workflow_path: str) -> Dict[str, Any]:
-    """从本地tools文件夹加载工作流"""
-    filename = os.path.basename(workflow_path)
-    if filename.endswith('.py'):
-        filename = filename.replace('.py', '.json')
-    
-    # 构建工作流文件路径
-    workflow_path = os.path.join(WORKFLOW_DIR, filename)
-    
-    if not os.path.exists(workflow_path):
-        raise Exception(f"工作流文件不存在: {workflow_path}")
-    
-    try:
-        with open(workflow_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        raise Exception(f"加载工作流文件失败: {e}")
 
 
 async def _load_workflow_from_url(url: str) -> Dict[str, Any]:
@@ -511,21 +491,20 @@ def get_workflow_metadata(workflow_file: str) -> Optional[WorkflowMetadata]:
     return parser.parse_workflow_file(workflow_file)
 
 async def execute_workflow(workflow_file: str, params: Dict[str, Any] = None) -> ExecuteResult:
-    """使用新解析器执行工作流"""
+    """执行工作流"""
     try:
+        if not os.path.exists(workflow_file):
+            logger.error(f"工作流文件不存在: {workflow_file}")
+            return ExecuteResult(status="error", msg=f"工作流文件不存在: {workflow_file}")
+        
         # 获取工作流元数据
         metadata = get_workflow_metadata(workflow_file)
         if not metadata:
             return ExecuteResult(status="error", msg="无法解析工作流元数据")
         
         # 加载工作流JSON
-        if os.path.exists(workflow_file):
-            # 直接使用完整路径
-            with open(workflow_file, 'r', encoding='utf-8') as f:
-                workflow_data = json.load(f)
-        else:
-            # 尝试从tools/workflows目录加载
-            workflow_data = _load_workflow_from_local(workflow_file)
+        with open(workflow_file, 'r', encoding='utf-8') as f:
+            workflow_data = json.load(f)
         
         if not workflow_data:
             return ExecuteResult(status="error", msg="工作流数据缺失")

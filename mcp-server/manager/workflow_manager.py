@@ -70,15 +70,16 @@ class WorkflowManager:
         # 必需参数在前，可选参数在后
         return ", ".join(required_params + optional_params)
     
-    def _generate_workflow_function(self, title: str, params_str: str, workflow_path: Path) -> str:
+    def _generate_workflow_function(self, title: str, params_str: str) -> str:
         """生成工作流执行函数代码"""
+        final_workflow_path = os.path.join(CUSTOM_WORKFLOW_DIR, f"{title}.json")
         return f'''async def {title}({params_str}):
     try:
         # 获取传入的参数（排除特殊参数）
         params = {{k: v for k, v in locals().items() if not k.startswith('_')}}
         
         # 执行工作流
-        result = await execute_workflow("{workflow_path}", params)
+        result = await execute_workflow("{final_workflow_path}", params)
         
         # 转换结果格式为LLM友好的格式
         if result.status == "completed":
@@ -180,7 +181,7 @@ class WorkflowManager:
             exec_locals = {}
             
             # 生成工作流执行函数
-            func_def = self._generate_workflow_function(title, params_str, workflow_path)
+            func_def = self._generate_workflow_function(title, params_str)
             # 执行函数定义
             exec(func_def, {
                 "metadata": metadata, 
