@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import time
 import re
@@ -92,24 +93,23 @@ class WorkflowManager:
         return f"工作流执行异常: {{str(e)}}"
 '''
     
-    def _register_workflow(self, workflow_path: Path, workflow_handler, metadata: WorkflowMetadata) -> None:
+    def _register_workflow(self, title: str, workflow_handler, metadata: WorkflowMetadata) -> None:
         """注册并记录工作流"""
         # 如果已存在同名工作流，先移除
-        if workflow_path.stem in self.loaded_workflows:
-            self.unload_workflow(workflow_path.stem)
+        if title in self.loaded_workflows:
+            self.unload_workflow(title)
         
         # 注册为MCP工具
         mcp.tool(workflow_handler)
         
         # 记录工作流信息
-        self.loaded_workflows[workflow_path.stem] = {
+        self.loaded_workflows[title] = {
             "function": workflow_handler,
             "metadata": metadata.model_dump(),
-            "file_path": str(workflow_path),
-            "loaded_at": f"{__import__('datetime').datetime.now()}"
+            "loaded_at": f"{datetime.now()}"
         }
         
-        logger.info(f"成功加载工作流: {workflow_path.stem}")
+        logger.info(f"成功加载工作流: {title}")
     
     def _save_workflow_if_needed(self, workflow_path: Path, title: str) -> Path:
         """如果需要，保存工作流文件到工作流目录"""
@@ -195,7 +195,7 @@ class WorkflowManager:
                 dynamic_function.__doc__ = metadata.description
             
             # 注册并记录工作流
-            self._register_workflow(workflow_path, dynamic_function, metadata)
+            self._register_workflow(title, dynamic_function, metadata)
             
             logger.info(f"工作流 '{title}' 已成功加载为MCP工具")
             return {
@@ -243,27 +243,6 @@ class WorkflowManager:
                 "error": f"卸载工作流失败: {str(e)}"
             }
     
-    def reload_workflow(self, workflow_name: str) -> Dict:
-        """重新加载工作流"""
-        if workflow_name not in self.loaded_workflows:
-            return {
-                "success": False,
-                "error": f"工作流 '{workflow_name}' 不存在或未加载"
-            }
-        
-        try:
-            # 获取工作流文件路径
-            workflow_path = Path(self.loaded_workflows[workflow_name]["file_path"])
-            
-            # 重新加载
-            return self.load_workflow(workflow_path)
-            
-        except Exception as e:
-            logger.error(f"重新加载工作流失败 {workflow_name}: {e}")
-            return {
-                "success": False,
-                "error": f"重新加载工作流失败: {str(e)}"
-            }
     
     def load_all_workflows(self) -> Dict:
         """加载所有工作流"""
