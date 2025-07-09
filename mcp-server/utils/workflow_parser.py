@@ -1,7 +1,7 @@
 import json
 import re
-import os
 from pathlib import Path
+from core import logger
 from typing import Dict, Any, Optional, List, Tuple
 from pydantic import BaseModel, Field
 
@@ -148,7 +148,7 @@ class WorkflowParser:
         # 6. 验证required逻辑
         is_required = dsl_info['required']
         if not is_required and default_value is None:
-            print(f"Warning: Parameter {dsl_info['name']} has no default value but not marked as required")
+            logger.warning(f"Parameter {dsl_info['name']} has no default value but not marked as required")
         
         # 7. 创建参数对象
         param = WorkflowParam(
@@ -181,7 +181,7 @@ class WorkflowParser:
             # MCP节点是可选的，没有找到时不报错
             return None
         elif len(mcp_nodes) > 1:
-            print(f"Error: 工作流中发现多个MCP节点({len(mcp_nodes)}个)，只允许存在一个MCP节点")
+            logger.error(f"工作流中发现多个MCP节点({len(mcp_nodes)}个)，只允许存在一个MCP节点")
             return None
         
         return mcp_nodes[0]
@@ -202,14 +202,14 @@ class WorkflowParser:
                     break
             
             if description_content is None:
-                print(f"Error: MCP节点中未找到有效的配置字段，尝试的字段: {possible_fields}")
+                logger.error(f"MCP节点中未找到有效的配置字段，尝试的字段: {possible_fields}")
                 return None
             
             # 直接返回文本内容作为description
             return description_content.strip() if isinstance(description_content, str) else str(description_content).strip()
             
         except Exception as e:
-            print(f"Error: 解析MCP节点配置失败: {e}")
+            logger.error(f"解析MCP节点配置失败: {e}", exc_info=True)
             return None
     
     def parse_workflow(self, workflow_data: Dict[str, Any], title: str) -> Optional[WorkflowMetadata]:
@@ -253,65 +253,17 @@ class WorkflowParser:
         
         return metadata
     
-    def parse_workflow_file(self, file_path: str) -> Optional[WorkflowMetadata]:
+    def parse_workflow_file(self, file_path: str, tool_name: str = None) -> Optional[WorkflowMetadata]:
         """解析工作流文件"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 workflow_data = json.load(f)
             
             # 从文件名提取title（移除后缀）
-            title = Path(file_path).stem
+            title = tool_name or Path(file_path).stem
             
             return self.parse_workflow(workflow_data, title)
             
         except Exception as e:
-            print(f"Error: 解析工作流文件失败 {file_path}: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"解析工作流文件失败 {file_path}: {e}", exc_info=True)
             return None
-
-
-def main():
-    """测试函数"""
-    print("🔍 开始测试工作流解析器...")
-    
-    # 创建解析器
-    parser = WorkflowParser()
-    
-    # 测试v2工作流
-    v2_path = "data/custom_workflows/v4.json"
-    print(f"\n📂 解析工作流文件: {v2_path}")
-    
-    metadata = parser.parse_workflow_file(v2_path)
-    
-    if metadata:
-        print("✅ 解析成功!")
-        print(f"\n📋 工作流信息:")
-        print(f"  标题: {metadata.title}")
-        print(f"  描述: {metadata.description}")
-        print(f"\n📝 参数列表 ({len(metadata.params)} 个):")
-        
-        for param_name, param in metadata.params.items():
-            required_mark = "必填" if param.required else "可选"
-            default_info = f" (默认: {param.default})" if param.default is not None else ""
-            enum_info = f" 选项: {param.enum_options}" if param.enum_options else ""
-            
-            print(f"  • {param_name}: {param.type} - {required_mark}{default_info}")
-            print(f"    描述: {param.description}{enum_info}")
-        
-        print(f"\n🔗 参数映射 ({len(metadata.mapping_info.param_mappings)} 个):")
-        for mapping in metadata.mapping_info.param_mappings:
-            print(f"  • {mapping.param_name} → 节点{mapping.node_id}.{mapping.input_field} ({mapping.node_class_type})")
-        
-        print(f"\n📤 输出映射 ({len(metadata.mapping_info.output_mappings)} 个):")
-        for mapping in metadata.mapping_info.output_mappings:
-            print(f"  • 节点{mapping.node_id} → {mapping.output_var}")
-        
-        print(f"\n📄 完整JSON:")
-        print(metadata.model_dump_json(indent=2))
-    else:
-        print("❌ 解析失败!")
-
-
-if __name__ == "__main__":
-    main() 

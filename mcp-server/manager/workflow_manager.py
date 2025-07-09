@@ -33,11 +33,11 @@ class WorkflowManager:
         self.observer.start()
         logger.info(f"开始监听工作流目录: {self.workflows_dir}")
     
-    def parse_workflow_metadata(self, workflow_path: Path) -> Optional[WorkflowMetadata]:
+    def parse_workflow_metadata(self, workflow_path: Path, tool_name: str = None) -> Optional[WorkflowMetadata]:
         """使用新的工作流解析器解析工作流元数据"""
         try:
             parser = WorkflowParser()
-            metadata = parser.parse_workflow_file(str(workflow_path))
+            metadata = parser.parse_workflow_file(str(workflow_path), tool_name)
             return metadata
         except Exception as e:
             logger.error(f"解析工作流元数据失败 {workflow_path}: {e}")
@@ -155,7 +155,7 @@ class WorkflowManager:
                 }
             
             # 使用新的解析器解析工作流元数据
-            metadata = self.parse_workflow_metadata(workflow_path)
+            metadata = self.parse_workflow_metadata(workflow_path, tool_name)
             if not metadata:
                 logger.error(f"无法解析工作流元数据: {workflow_path}")
                 return {
@@ -163,10 +163,8 @@ class WorkflowManager:
                     "error": f"无法解析工作流元数据: {workflow_path}"
                 }
 
-            # 创建工具处理函数的参数列表
-            title = tool_name or metadata.title
-            
             # 验证title格式
+            title = metadata.title
             if not re.match(r'^[a-zA-Z0-9_\.-]+$', title):
                 logger.error(f"工具名称 '{title}' 格式无效。只允许使用字母、数字、下划线、点和连字符。")
                 return {
