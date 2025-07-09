@@ -106,7 +106,7 @@ class WorkflowManager:
         self.loaded_workflows[title] = {
             "function": workflow_handler,
             "metadata": metadata.model_dump(),
-            "loaded_at": f"{datetime.now()}"
+            "loaded_at": datetime.now()
         }
         
         logger.info(f"成功加载工作流: {title}")
@@ -162,17 +162,28 @@ class WorkflowManager:
 
             # 验证title格式
             title = metadata.title
+            
+            # 防抖机制：检查是否在1秒内刚加载过同名工作流
+            if title in self.loaded_workflows:
+                last_loaded_at = self.loaded_workflows[title]["loaded_at"]
+                if isinstance(last_loaded_at, datetime):
+                    time_diff = (datetime.now() - last_loaded_at).total_seconds()
+                    if time_diff < 1.0:
+                        logger.debug(f"工作流 '{title}' 在1秒内刚加载过，跳过重复处理")
+                        return {
+                            "success": True,
+                            "workflow": title,
+                            "metadata": metadata.model_dump(),
+                            "message": f"工作流 '{title}' 已存在，跳过重复加载"
+                        }
+            
+            # 验证title格式
             if not re.match(r'^[a-zA-Z0-9_\.-]+$', title):
                 logger.error(f"工具名称 '{title}' 格式无效。只允许使用字母、数字、下划线、点和连字符。")
                 return {
                     "success": False,
                     "error": f"工具名称 '{title}' 格式无效。只允许使用字母、数字、下划线、点和连字符。"
                 }
-            
-            # 如果需要，保存工作流文件到工作流目录
-            if save_workflow_if_not_exists:
-                workflow_path = self._save_workflow_if_needed(workflow_path, title)
-                logger.info(f"工作流文件已保存到: {workflow_path}")
             
             # 生成参数字符串
             params_str = self._generate_params_str(metadata.params)
@@ -196,6 +207,11 @@ class WorkflowManager:
             
             # 注册并记录工作流
             self._register_workflow(title, dynamic_function, metadata)
+            
+            # 如果需要，保存工作流文件到工作流目录
+            if save_workflow_if_not_exists:
+                workflow_path = self._save_workflow_if_needed(workflow_path, title)
+                logger.info(f"工作流文件已保存到: {workflow_path}")
             
             logger.info(f"工作流 '{title}' 已成功加载为MCP工具")
             return {
@@ -224,6 +240,11 @@ class WorkflowManager:
         try:
             # 从MCP服务器中移除
             mcp.remove_tool(workflow_name)
+            
+            # 删除工作流文件
+            workflow_path = os.path.join(CUSTOM_WORKFLOW_DIR, f"{workflow_name}.json")
+            if os.path.exists(workflow_path):
+                os.remove(workflow_path)
             
             # 从记录中删除
             del self.loaded_workflows[workflow_name]
@@ -274,7 +295,7 @@ class WorkflowManager:
             "workflows": {
                 name: {
                     "metadata": info["metadata"],
-                    "loaded_at": info["loaded_at"]
+                    "loaded_at": info["loaded_at"].strftime("%Y-%m-%d %H:%M:%S") if isinstance(info["loaded_at"], datetime) else str(info["loaded_at"])
                 }
                 for name, info in self.loaded_workflows.items()
             }
