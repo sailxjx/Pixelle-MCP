@@ -521,16 +521,8 @@ async def hook_by_starters(message: cl.Message):
             continue
             
         starter_message = first_user_item.get("content", "")
-        # 处理starter消息的\u200B前缀标识
-        if starter_message.startswith("\u200B"):
-            # starter消息：去掉前缀进行匹配
-            actual_starter_content = starter_message[1:]  # 去掉\u200B前缀
-            if message.content != actual_starter_content:
-                continue
-        else:
-            # 老版本starter或者真实用户消息：直接匹配
-            if message.content != starter_message:
-                continue
+        if message.content != starter_message:
+            continue
             
         # 检查并处理starter中的图片元素
         starter_elements = first_user_item.get("elements", [])
