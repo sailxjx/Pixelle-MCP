@@ -99,27 +99,23 @@ class WorkflowManager:
         
         logger.info(f"成功加载工作流: {title}")
     
-    def _save_workflow_if_needed(self, workflow_path: Path, title: str) -> Path:
+    def _save_workflow_if_needed(self, workflow_path: Path, title: str):
         """如果需要，保存工作流文件到工作流目录"""
         target_workflow_path = self.workflows_dir / f"{title}.json"
         
-        if not target_workflow_path.exists():
-            try:
-                # 确保工作流目录存在
-                self.workflows_dir.mkdir(parents=True, exist_ok=True)
-                
-                # 复制工作流文件到工作流目录
-                import shutil
-                shutil.copy2(workflow_path, target_workflow_path)
-                logger.info(f"工作流文件已保存到: {target_workflow_path}")
-                
-                return target_workflow_path
-            except Exception as e:
-                logger.warning(f"保存工作流文件失败: {e}")
+        try:
+            # 确保工作流目录存在
+            self.workflows_dir.mkdir(parents=True, exist_ok=True)
+            
+            # 复制工作流文件到工作流目录
+            import shutil
+            shutil.copy2(workflow_path, target_workflow_path)
+            logger.info(f"工作流文件已保存到: {target_workflow_path}")
+        except Exception as e:
+            logger.warning(f"保存工作流文件失败: {e}")
         
-        return workflow_path
 
-    def load_workflow(self, workflow_path: Path | str, tool_name: str = None, save_workflow_if_not_exists: bool = True) -> Dict:
+    def load_workflow(self, workflow_path: Path | str, tool_name: str = None) -> Dict:
         """加载单个工作流
         
         Args:
@@ -182,10 +178,8 @@ class WorkflowManager:
             # 注册并记录工作流
             self._register_workflow(title, dynamic_function, metadata)
             
-            # 如果需要，保存工作流文件到工作流目录
-            if save_workflow_if_not_exists:
-                workflow_path = self._save_workflow_if_needed(workflow_path, title)
-                logger.info(f"工作流文件已保存到: {workflow_path}")
+            # 保存工作流文件到工作流目录
+            self._save_workflow_if_needed(workflow_path, title)
             
             logger.info(f"工作流 '{title}' 已成功加载为MCP工具")
             return {
