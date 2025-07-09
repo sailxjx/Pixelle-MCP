@@ -148,7 +148,9 @@ class WorkflowParser:
         # 6. 验证required逻辑
         is_required = dsl_info['required']
         if not is_required and default_value is None:
-            logger.warning(f"Parameter {dsl_info['name']} has no default value but not marked as required")
+            message = f"Parameter `{dsl_info['name']}` has no default value but not marked as required"
+            logger.error(message)
+            raise Exception(message)
         
         # 7. 创建参数对象
         param = WorkflowParam(
@@ -255,15 +257,11 @@ class WorkflowParser:
     
     def parse_workflow_file(self, file_path: str, tool_name: str = None) -> Optional[WorkflowMetadata]:
         """解析工作流文件"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                workflow_data = json.load(f)
+        with open(file_path, 'r', encoding='utf-8') as f:
+            workflow_data = json.load(f)
+        
+        # 从文件名提取title（移除后缀）
+        title = tool_name or Path(file_path).stem
+        
+        return self.parse_workflow(workflow_data, title)
             
-            # 从文件名提取title（移除后缀）
-            title = tool_name or Path(file_path).stem
-            
-            return self.parse_workflow(workflow_data, title)
-            
-        except Exception as e:
-            logger.error(f"解析工作流文件失败 {file_path}: {e}", exc_info=True)
-            return None

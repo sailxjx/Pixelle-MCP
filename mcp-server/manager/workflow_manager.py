@@ -36,13 +36,9 @@ class WorkflowManager:
     
     def parse_workflow_metadata(self, workflow_path: Path, tool_name: str = None) -> Optional[WorkflowMetadata]:
         """使用新的工作流解析器解析工作流元数据"""
-        try:
-            parser = WorkflowParser()
-            metadata = parser.parse_workflow_file(str(workflow_path), tool_name)
-            return metadata
-        except Exception as e:
-            logger.error(f"解析工作流元数据失败 {workflow_path}: {e}")
-            return None
+        parser = WorkflowParser()
+        metadata = parser.parse_workflow_file(str(workflow_path), tool_name)
+        return metadata
     
     def _generate_params_str(self, params: Dict[str, Any]) -> str:
         """生成函数参数字符串"""
@@ -74,24 +70,32 @@ class WorkflowManager:
     def _generate_workflow_function(self, title: str, params_str: str) -> str:
         """生成工作流执行函数代码"""
         final_workflow_path = os.path.join(CUSTOM_WORKFLOW_DIR, f"{title}.json")
-        return f'''async def {title}({params_str}):
+        
+        # 使用字符串模板而不是f-string来避免大括号冲突
+        template = '''async def {title}({params_str}):
     try:
         # 获取传入的参数（排除特殊参数）
         params = {{k: v for k, v in locals().items() if not k.startswith('_')}}
         
         # 执行工作流
-        result = await execute_workflow("{final_workflow_path}", params)
+        result = await execute_workflow("{workflow_path}", params)
         
         # 转换结果格式为LLM友好的格式
         if result.status == "completed":
             return result.to_llm_result()
         else:
-            return f"工作流执行失败: {{result.msg or result.status}}"
+            return "工作流执行失败: " + str(result.msg or result.status)
             
     except Exception as e:
-        logger.error(f"工作流执行失败 {title}: {{e}}", exc_info=True)
-        return f"工作流执行异常: {{str(e)}}"
+        logger.error("工作流执行失败 {title}: " + str(e), exc_info=True)
+        return "工作流执行异常: " + str(e)
 '''
+        
+        return template.format(
+            title=title,
+            params_str=params_str,
+            workflow_path=final_workflow_path
+        )
     
     def _register_workflow(self, title: str, workflow_handler, metadata: WorkflowMetadata) -> None:
         """注册并记录工作流"""
