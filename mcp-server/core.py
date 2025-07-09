@@ -1,3 +1,4 @@
+from typing import Callable
 from fastmcp import FastMCP
 from dotenv import load_dotenv
 import logging
@@ -5,8 +6,6 @@ import os
 
 # 初始化MCP服务器
 mcp = FastMCP("pixel-mcp")
-mcp_tool = mcp.tool
-mcp_resource = mcp.resource
 
 # 日志配置
 logger_level = logging.INFO

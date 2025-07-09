@@ -278,7 +278,7 @@ async def _upload_media(media_path: str) -> str:
             return result.get('name', '')
 
 
-async def _apply_params_to_workflow_v2(workflow_data: Dict[str, Any], metadata: WorkflowMetadata, params: Dict[str, Any]) -> Dict[str, Any]:
+async def _apply_params_to_workflow(workflow_data: Dict[str, Any], metadata: WorkflowMetadata, params: Dict[str, Any]) -> Dict[str, Any]:
     """使用新解析器将参数应用到工作流"""
     workflow_data = copy.deepcopy(workflow_data)
     
@@ -302,7 +302,7 @@ async def _apply_params_to_workflow_v2(workflow_data: Dict[str, Any], metadata: 
     return workflow_data
 
 
-def _extract_output_nodes_v2(metadata: WorkflowMetadata) -> Dict[str, str]:
+def _extract_output_nodes(metadata: WorkflowMetadata) -> Dict[str, str]:
     """从元数据提取输出节点及其输出变量名"""
     output_id_2_var = {}
     
@@ -505,30 +505,12 @@ async def _wait_for_results(prompt_id: str, timeout: Optional[int] = None, outpu
         await asyncio.sleep(1.0)
 
 
-async def execute_workflow(workflow: str, params: Dict[str, Any] = None) -> ExecuteResult:
-    """异步执行工作流（向后兼容版本）"""
-    try:
-        # 如果是URL，暂时不支持新解析器
-        if workflow.startswith('http://') or workflow.startswith('https://'):
-            return ExecuteResult(status="error", msg="URL工作流暂不支持，请使用本地文件")
-        
-        # 尝试使用新解析器
-        try:
-            return await execute_workflow_v2(workflow, params)
-        except Exception as e:
-            logger.warning(f"新解析器失败，原因: {e}")
-            return ExecuteResult(status="error", msg=f"工作流解析失败: {str(e)}")
-        
-    except Exception as e:
-        logger.error(f"执行工作流出错: {str(e)}", exc_info=True)
-        return ExecuteResult(status="error", msg=str(e))
-
 def get_workflow_metadata(workflow_file: str) -> Optional[WorkflowMetadata]:
     """获取工作流元数据（使用新的解析器）"""
     parser = WorkflowParser()
     return parser.parse_workflow_file(workflow_file)
 
-async def execute_workflow_v2(workflow_file: str, params: Dict[str, Any] = None) -> ExecuteResult:
+async def execute_workflow(workflow_file: str, params: Dict[str, Any] = None) -> ExecuteResult:
     """使用新解析器执行工作流"""
     try:
         # 获取工作流元数据
@@ -550,13 +532,13 @@ async def execute_workflow_v2(workflow_file: str, params: Dict[str, Any] = None)
         
         # 使用新的参数映射逻辑
         if params:
-            workflow_data = await _apply_params_to_workflow_v2(workflow_data, metadata, params)
+            workflow_data = await _apply_params_to_workflow(workflow_data, metadata, params)
         else:
             # 即使没有传入参数，也需要应用默认值
-            workflow_data = await _apply_params_to_workflow_v2(workflow_data, metadata, {})
+            workflow_data = await _apply_params_to_workflow(workflow_data, metadata, {})
         
         # 从元数据提取输出节点信息
-        output_id_2_var = _extract_output_nodes_v2(metadata)
+        output_id_2_var = _extract_output_nodes(metadata)
         
         # 生成客户端ID
         client_id = str(uuid.uuid4())
@@ -601,7 +583,7 @@ if __name__ == "__main__":
         
         # 执行工作流
         print("⏳ 正在执行工作流...")
-        result = await execute_workflow_v2(workflow_file, {
+        result = await execute_workflow(workflow_file, {
             "prompt": "a beautiful anime girl with blue hair, masterpiece, high quality",
             "width": 768,
             "height": 512

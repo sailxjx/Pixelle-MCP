@@ -1,11 +1,11 @@
 import json
 from pydantic import Field
-from core import mcp_tool, logger
+from core import mcp, logger
 from PIL import Image
 from utils.upload_util import upload
 from utils.file_util import download_files, create_temp_file
 
-@mcp_tool
+@mcp.tool
 async def i_crop(
     image_url: str = Field(description="The URL of the image to crop"),
 ):

@@ -1,4 +1,4 @@
-from core import mcp_resource
+from core import mcp
 
 USAGE = """
 你是一个专注围绕AIGC的AI助手，你要基于提供给你的工具来与用户对话。当用户需要图像生成或编辑时，请注意以下选择逻辑：
@@ -30,7 +30,7 @@ USAGE = """
         ①. 如果是i2v的场景，要首选使用WAN2.1 FusionX模型，如果用户明确要求使用Kling模型，才切换到Kling模型。
 """
 
-@mcp_resource(uri="usage://tools")
+@mcp.resource(uri="usage://tools")
 def usage():
     """
     This is a usage prompt for all mcp tools about this mcp server.

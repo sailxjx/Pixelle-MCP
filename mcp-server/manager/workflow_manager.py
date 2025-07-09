@@ -1,15 +1,15 @@
-import json
 import os
 import time
+import re
 from pathlib import Path
 from typing import Dict, Any, Optional
-from pydantic import BaseModel, Field
-from core import mcp_tool, logger
+from pydantic import Field
+from core import mcp, logger
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from utils.os_util import get_data_path
 from utils.workflow_parser import WorkflowParser, WorkflowMetadata
-from utils.comfyui_util import execute_workflow_v2
+from utils.comfyui_util import execute_workflow
 
 CUSTOM_WORKFLOW_DIR = get_data_path("custom_workflows")
 os.makedirs(CUSTOM_WORKFLOW_DIR, exist_ok=True)
@@ -19,7 +19,7 @@ class WorkflowManager:
     
     def __init__(self, workflows_dir: str = CUSTOM_WORKFLOW_DIR):
         self.workflows_dir = Path(workflows_dir)
-        self.loaded_workflows = {}  # 跟踪已加载的工作流 {workflow_name: workflow_info}
+        self.loaded_workflows = {}
         self.setup_file_watcher()
         
     def setup_file_watcher(self):
@@ -70,28 +70,19 @@ class WorkflowManager:
         # 必需参数在前，可选参数在后
         return ", ".join(required_params + optional_params)
     
-    def _generate_workflow_function(self, title: str, params_str: str, workflow_path: Path, description: Optional[str] = None) -> str:
+    def _generate_workflow_function(self, title: str, params_str: str, workflow_path: Path) -> str:
         """生成工作流执行函数代码"""
-        # 根据是否有description生成docstring
-        if description:
-            docstring_part = f'''    """
-    {description}
-    """
-'''
-        else:
-            docstring_part = ""
-        
         # 从路径中提取文件名（不含扩展名）用于错误日志
         workflow_name = Path(workflow_path).stem
         
         # 生成完整的函数定义
         return f'''async def {title}({params_str}):
-{docstring_part}    try:
+    try:
         # 获取传入的参数（排除特殊参数）
         params = {{k: v for k, v in locals().items() if not k.startswith('_')}}
         
         # 执行工作流
-        result = await execute_workflow_v2("{workflow_path}", params)
+        result = await execute_workflow("{workflow_path}", params)
         
         # 转换结果格式为LLM友好的格式
         if result.status == "completed":
@@ -111,7 +102,7 @@ class WorkflowManager:
             self.unload_workflow(workflow_path.stem)
         
         # 注册为MCP工具
-        mcp_tool(workflow_handler)
+        mcp.tool(workflow_handler)
         
         # 记录工作流信息
         self.loaded_workflows[workflow_path.stem] = {
@@ -143,12 +134,12 @@ class WorkflowManager:
         
         return workflow_path
 
-    def load_workflow(self, workflow_path: Path | str, default_tool_name: str = None, save_workflow_if_not_exists: bool = True) -> Dict:
+    def load_workflow(self, workflow_path: Path | str, tool_name: str = None, save_workflow_if_not_exists: bool = True) -> Dict:
         """加载单个工作流
         
         Args:
             workflow_path: 工作流文件路径
-            default_tool_name: 默认工具名称（当工作流中未指定title时使用）
+            tool_name: 工具名称，优先级高于工作流文件名
             save_workflow_if_not_exists: 是否将工作流文件保存到工作流目录（如果目标文件不存在）
         """
         try:
@@ -157,6 +148,7 @@ class WorkflowManager:
             
             # 检查文件是否存在
             if not workflow_path.exists():
+                logger.error(f"工作流文件不存在: {workflow_path}")
                 return {
                     "success": False,
                     "error": f"工作流文件不存在: {workflow_path}"
@@ -165,45 +157,52 @@ class WorkflowManager:
             # 使用新的解析器解析工作流元数据
             metadata = self.parse_workflow_metadata(workflow_path)
             if not metadata:
+                logger.error(f"无法解析工作流元数据: {workflow_path}")
                 return {
                     "success": False,
                     "error": f"无法解析工作流元数据: {workflow_path}"
                 }
 
             # 创建工具处理函数的参数列表
-            title = metadata.title or default_tool_name
+            title = tool_name or metadata.title
             
-            if not title:
+            # 验证title格式
+            if not re.match(r'^[a-zA-Z0-9_\.-]+$', title):
+                logger.error(f"工具名称 '{title}' 格式无效。只允许使用字母、数字、下划线、点和连字符。")
                 return {
                     "success": False,
-                    "error": f"工作流中未找到有效的工具名称"
+                    "error": f"工具名称 '{title}' 格式无效。只允许使用字母、数字、下划线、点和连字符。"
                 }
             
             # 如果需要，保存工作流文件到工作流目录
             if save_workflow_if_not_exists:
                 workflow_path = self._save_workflow_if_needed(workflow_path, title)
+                logger.info(f"工作流文件已保存到: {workflow_path}")
             
             # 生成参数字符串
             params_str = self._generate_params_str(metadata.params)
             
             # 创建工具处理函数
-            exec_globals = {}
             exec_locals = {}
             
             # 生成工作流执行函数
-            func_def = self._generate_workflow_function(title, params_str, workflow_path, metadata.description)
+            func_def = self._generate_workflow_function(title, params_str, workflow_path)
             # 执行函数定义
             exec(func_def, {
                 "metadata": metadata, 
                 "logger": logger, 
                 "Field": Field,
-                "execute_workflow_v2": execute_workflow_v2
+                "execute_workflow": execute_workflow
             }, exec_locals)
-            workflow_handler = exec_locals[title]
+            
+            dynamic_function = exec_locals[title]
+            if metadata.description:
+                dynamic_function.__doc__ = metadata.description
             
             # 注册并记录工作流
-            self._register_workflow(workflow_path, workflow_handler, metadata)
+            self._register_workflow(workflow_path, dynamic_function, metadata)
             
+            logger.info(f"工作流 '{workflow_path.stem}' 已成功加载为MCP工具")
             return {
                 "success": True,
                 "workflow": workflow_path.stem,
@@ -212,7 +211,7 @@ class WorkflowManager:
             }
             
         except Exception as e:
-            logger.error(f"加载工作流失败 {workflow_path}: {e}")
+            logger.error(f"加载工作流失败 {workflow_path}: {e}", exc_info=True)
             return {
                 "success": False,
                 "error": f"加载工作流失败: {str(e)}"
@@ -228,8 +227,8 @@ class WorkflowManager:
             }
         
         try:
-            # 获取工作流信息
-            workflow_info = self.loaded_workflows[workflow_name]
+            # 从MCP服务器中移除
+            mcp.remove_tool(workflow_name)
             
             # 从记录中删除
             del self.loaded_workflows[workflow_name]
@@ -321,14 +320,24 @@ class WorkflowEventHandler(FileSystemEventHandler):
         self._last_modified_time = {}
     
     def on_created(self, event):
-        if event.is_directory or not event.src_path.endswith('.json'):
+        if event.is_directory or not self._is_workflow_file(event.src_path):
             return
         
         logger.info(f"检测到新工作流文件: {event.src_path}")
         self.manager.load_workflow(Path(event.src_path))
+        
+    def on_moved(self, event):
+        if event.is_directory:
+            return
+        
+        logger.info(f"检测到工作流文件移动: {event.src_path} => {event.dest_path}")
+        if self._is_workflow_file(event.src_path):
+            self.manager.unload_workflow(Path(event.src_path).stem)
+        if self._is_workflow_file(event.dest_path):
+            self.manager.load_workflow(Path(event.dest_path))
     
     def on_modified(self, event):
-        if event.is_directory or not event.src_path.endswith('.json'):
+        if event.is_directory or not self._is_workflow_file(event.src_path):
             return
             
         # 防止重复触发
@@ -342,13 +351,16 @@ class WorkflowEventHandler(FileSystemEventHandler):
         self.manager.load_workflow(Path(event.src_path))
     
     def on_deleted(self, event):
-        if event.is_directory or not event.src_path.endswith('.json'):
+        if event.is_directory or not self._is_workflow_file(event.src_path):
             return
         
         workflow_name = Path(event.src_path).stem
         if workflow_name in self.manager.loaded_workflows:
             logger.info(f"检测到工作流文件删除: {event.src_path}")
             self.manager.unload_workflow(workflow_name)
+            
+    def _is_workflow_file(self, path: str) -> bool:
+        return path.endswith('.json')
 
 # 创建工作流管理器实例
 workflow_manager = WorkflowManager()
