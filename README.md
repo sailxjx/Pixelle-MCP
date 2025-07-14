@@ -1,4 +1,4 @@
-# Pixel MCP
+# Pixelle MCP
 
 这是一个基于 MCP (Model Context Protocol) 的 AIGC 工具集合项目，采用 monorepo 架构管理。
 
@@ -36,7 +36,7 @@ REMOTE_HOST=192.168.1.100 REMOTE_USER=user ./redeploy.sh
 **默认远程服务器配置**：
 - 服务器地址: `30.150.44.149`
 - 用户名: `sss`
-- 项目目录: `/home/sss/puke/workspace/pixel-mcp`
+- 项目目录: `/home/sss/puke/workspace/pixelle-mcp`
 
 可以通过环境变量自定义：
 ```bash
@@ -172,7 +172,7 @@ CHAINLIT_PORT=9003
 1. **克隆项目**
    ```bash
    git clone <repository-url>
-   cd pixel-mcp
+   cd pixelle-mcp
    ```
 
 2. **配置环境**

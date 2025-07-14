@@ -20,7 +20,7 @@ function initMcp() {
 
     const defaultMcp = [
         {
-            "name": "pixel-mcp", 
+            "name": "pixelle-mcp", 
             "tools": [],
             "clientType": "sse",
             "command": null,

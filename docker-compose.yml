@@ -38,7 +38,7 @@ services:
       "
     restart: "no"
 
-  # Pixel MCP 服务端
+  # Pixelle MCP 服务端
   mcp-server:
     build: ./mcp-server
     profiles: ["server", "all"]
@@ -62,7 +62,7 @@ services:
       start_period: 2s
     restart: unless-stopped
 
-  # Pixel MCP 客户端
+  # Pixelle MCP 客户端
   mcp-client:
     build: ./mcp-client
     profiles: ["client", "all"]

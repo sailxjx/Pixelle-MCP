@@ -6,7 +6,7 @@ import os
 
 # 初始化MCP服务器
 mcp = FastMCP(
-    name="pixel-mcp",
+    name="pixelle-mcp",
     on_duplicate_tools="replace",
 )
 

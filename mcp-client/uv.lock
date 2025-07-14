@@ -1797,7 +1797,7 @@ wheels = [
 ]
 
 [[package]]
-name = "pixel-mcp-client"
+name = "pixelle-mcp-client"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

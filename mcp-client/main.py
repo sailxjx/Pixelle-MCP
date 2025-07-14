@@ -53,8 +53,8 @@ async def on_mcp(connection, session: ClientSession):
     
     cl.user_session.set("mcp_session", session)
     
-    # pixel-mcp单独适配
-    if connection.name == "pixel-mcp":
+    # pixelle-mcp单独适配
+    if connection.name == "pixelle-mcp":
         result_resource = await session.read_resource("usage://tools")
         usage_tools = result_resource.contents[0].text
         if usage_tools:
