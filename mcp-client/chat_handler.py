@@ -504,7 +504,7 @@ async def process_streaming_response(
         
         # 如果有工具，添加工具参数
         if tools:
-            api_params["tools"] = tools[:2]
+            api_params["tools"] = tools
             api_params["tool_choice"] = "auto"
         
         client = AsyncOpenAI(
