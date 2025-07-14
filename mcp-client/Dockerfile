@@ -17,9 +17,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 # 设置工作目录
 WORKDIR /app
 
-# 创建必要的文件夹并设置权限
-RUN mkdir -p /app/.files && chown -R ${UID}:${GID} /app/.files
-
 # 复制所有文件
 COPY . .
 
