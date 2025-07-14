@@ -8,6 +8,7 @@ from openai import AsyncOpenAI
 from mcp import ClientSession
 import re
 from httpx import Timeout
+from llm_util import ModelInfo
 from starters import build_save_action
 from time_util import format_duration
 
@@ -435,7 +436,8 @@ async def _handle_stream_response(client, api_params, enhanced_messages, message
                     logger.debug(f"Error closing response stream: {close_error}")
                     
     except Exception as api_error:
-        logger.error(f"API request error: {api_error}")
+        logger.error(f"API request error: {api_error}", exc_info=True)
+        
     
     # 如果没有工具调用，处理媒体标记并发送消息
     if not has_tool_call:
@@ -452,7 +454,7 @@ async def _handle_stream_response(client, api_params, enhanced_messages, message
 
 async def process_streaming_response(
     messages: List[Dict[str, Any]], 
-    model: str,
+    model_info: ModelInfo,
     **kwargs
 ) -> List[Dict[str, Any]]:
     """
@@ -460,7 +462,7 @@ async def process_streaming_response(
     
     Args:
         messages: 消息历史
-        model: 使用的模型名称
+        model_info: 使用的模型信息
         **kwargs: 其他 OpenAI API 参数
         
     Returns:
@@ -489,11 +491,12 @@ async def process_streaming_response(
     
     # 注入媒体显示系统指令
     enhanced_messages = _inject_system_instruction(messages)
+    enhanced_messages = messages.copy()
     
     while True:  # 循环处理工具调用
         # 准备 API 参数
         api_params = {
-            "model": model,
+            "model": model_info.name,
             "messages": enhanced_messages,
             "stream": True,
             **kwargs
@@ -501,10 +504,14 @@ async def process_streaming_response(
         
         # 如果有工具，添加工具参数
         if tools:
-            api_params["tools"] = tools
+            api_params["tools"] = tools[:2]
             api_params["tool_choice"] = "auto"
         
-        client = AsyncOpenAI(timeout=Timeout(None))
+        client = AsyncOpenAI(
+            timeout=Timeout(None), 
+            api_key=model_info.api_key, 
+            base_url=model_info.base_url,
+        )
         
         try:
             enhanced_messages, should_continue = await _handle_stream_response(

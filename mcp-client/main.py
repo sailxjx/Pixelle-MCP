@@ -1,19 +1,35 @@
 import chainlit as cl
 from mcp import ClientSession
+import llm_util
 from message_converter import messages_from_chaintlit_to_openai
 import starters
 import auth
 import os
 
 from core import logger
-from prompt import PROMPT_TOOLS_NOT_FOUND, SYSTEM_MESSAGE
+from openai import OpenAI
+from prompt import SYSTEM_MESSAGE
 from tool_converter import tools_from_chaintlit_to_openai
-from mcp_tool_handler import handle_mcp_connect, handle_mcp_disconnect
+from chat_handler import handle_mcp_connect, handle_mcp_disconnect
 from chat_settings import setup_chat_settings, setup_settings_update
-import mcp_tool_handler as tool_handler
+import chat_handler as tool_handler
 from upload_util import upload
 
-CHAINLIT_CHAT_LLM = os.getenv("CHAINLIT_CHAT_LLM")
+
+@cl.set_chat_profiles
+async def chat_profile():
+    models = llm_util.get_all_models()
+    default_model = llm_util.get_default_model()
+    return [
+        cl.ChatProfile(
+            name=model.name,
+            markdown_description=f"Use **{model.name}** to talk with you.",
+            # icon="https://picsum.photos/200",
+            icon=model.icon,
+            default=default_model and model.name == default_model.name,
+        )
+        for model in models
+    ]
 
 @cl.on_chat_start
 async def start():
@@ -75,19 +91,15 @@ async def on_message(message: cl.Message):
     if need_update:
         await message.update()
     
-    tools = tool_handler.get_all_tools()
-    if not tools:
-        logger.info("首次使用，请先点击下方输入框中的🔌图标，添加MCP配置")
-        await cl.Message(content=PROMPT_TOOLS_NOT_FOUND).send()
-        return
-    
     cl_messages = cl.chat_context.get()
     messages = messages_from_chaintlit_to_openai(cl_messages)
     
     # 使用工具处理器处理流式响应和工具调用
+    chat_profile = cl.user_session.get("chat_profile")
+    model_info = llm_util.get_model_info_by_name(chat_profile)
     await tool_handler.process_streaming_response(
         messages=messages,
-        model=CHAINLIT_CHAT_LLM,
+        model_info=model_info,
     )
 
 
