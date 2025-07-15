@@ -1,192 +1,142 @@
 # Pixelle MCP
 
-这是一个基于 MCP (Model Context Protocol) 的 AIGC 工具集合项目，采用 monorepo 架构管理。
+> 这是一个基于 MCP (Model Context Protocol) 的 AIGC 工具集合项目，致力于打造AI生态的大一统解决方案。
 
-## 🏗️ 项目结构
+<效果演示 | 待补充>
 
-- **mcp-client/**: MCP 客户端，基于 Chainlit 构建的 Web 界面
-- **mcp-server/**: MCP 服务端，提供各种 AIGC 工具和服务
+## 项目结构
 
-## 🚀 快速启动
+- **mcp-client**: MCP 客户端，基于 Chainlit 构建的 Web 界面
+- **mcp-server**: MCP 服务端，提供各种 AIGC 工具和服务
 
-### 远程部署（推荐）
+## 功能特性
 
-使用 `redeploy.sh` 脚本可以方便地部署到远程服务器：
+- [x] 支持TISV（Text、Image、Sound/Speech、Video）全模态的互转和生成；
+- [x] 底层基于 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 实现，继承 ComfyUI 的开放生态下的所有能力；
+- [x] 制定并实现了 Workflow 即 MCP Tool 的方案，0代码开发，即可动态添加新的 MCP Tool；
+- [ ] 
+- [x] server端基于 [MCP](https://modelcontextprotocol.io/introduction) 协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）；
+- [x] client端基于 [Chaintlit](https://github.com/Chainlit/chainlit) 框架开发，继承了 Chainlit 的UI交互控件，支持集成更多的MCP Server；
 
-```bash
-# 部署所有服务到远程服务器
-./redeploy.sh
 
-# 仅重启远程服务端
-./redeploy.sh server
 
-# 仅重启远程客户端
-./redeploy.sh client
+## 快速开始
 
-# 强制重新构建远程服务
-./redeploy.sh -f
+### 1. 克隆仓库源码
 
-# 查看帮助
-./redeploy.sh -h
-
-# 使用自定义服务器
-REMOTE_HOST=192.168.1.100 REMOTE_USER=user ./redeploy.sh
+```shell
+git clone https://github.com/AIDC-AI/Pixelle-MCP.git
+cd Pixelle-MCP
 ```
 
-**默认远程服务器配置**：
-- 服务器地址: `30.150.44.149`
-- 用户名: `sss`
-- 项目目录: `/home/sss/puke/workspace/pixelle-mcp`
+### 2. 完成关键配置
 
-可以通过环境变量自定义：
-```bash
-export REMOTE_HOST=your-server-ip
-export REMOTE_USER=your-username
-export PROJECT_DIR=/path/to/your/project
-./redeploy.sh
+```shell
+cd mcp-server
+cp .env.example .env
+# 按需更改.env的配置
 ```
 
-### 本地部署
-
-如果需要在本地部署，可以直接使用 Docker Compose：
-
-```bash
-# 构建并启动所有服务
-docker-compose up -d --build
-
-# 停止所有服务
-docker-compose down
-
-# 查看服务状态
-docker-compose ps
-
-# 查看日志
-docker-compose logs -f
-
-# 重启特定服务
-docker-compose restart mcp-server
-docker-compose restart mcp-client
+```shell
+cd mcp-client
+cp .env.example .env
+# 按需更改.env的配置
 ```
 
-## 📋 服务信息
+### 3. 启动服务
 
-部署完成后，可以通过以下地址访问：
+#### 3.1 Docker方式启动（推荐）
 
-**远程部署**：
-- **客户端**: http://30.150.44.149:9003 (Chainlit Web UI)
-- **服务端**: http://30.150.44.149:9002 (MCP Server)
-- **MinIO**: http://30.150.44.149:9001 (对象存储管理界面)
+```shell
+docker compose --profile all up -d
+```
 
-**本地部署**：
+运行完成之后，对应这几个服务都会开启：
+
 - **客户端**: http://localhost:9003 (Chainlit Web UI)
 - **服务端**: http://localhost:9002 (MCP Server)
 - **MinIO**: http://localhost:9001 (对象存储管理界面)
 
-## 🛠️ 环境配置
+#### 3.2 源码方式启动
 
-### 服务端配置
+a. 自行运行 [minio](https://github.com/minio/minio) 服务；
 
-创建 `mcp-server/.env` 文件：
+b. 安装 [uv](https://github.com/astral-sh/uv) 环境；
 
-```env
-# MinIO 配置
-MINIO_USERNAME=admin
-MINIO_PASSWORD=password123
-MINIO_BUCKET=aigc-bucket
+c. 启动服务端；
 
-# MCP 服务配置
-MCP_HOST=0.0.0.0
-MCP_PORT=9002
+     ```shell
+     # 进入目录
+     cd mcp-server
+     # 安装依赖 (仅首次或更新时需要)
+     uv sync
+     # 启动服务
+     uv run main.py
+     ```
 
-# 外部服务（可选）
-COMFYUI_BASE_URL=http://your-comfyui-server
-COMFYUI_API_KEY=your-api-key
+d. 启动客户端；
+
+```shell
+# 进入目录
+cd mcp-client
+# 安装依赖 (仅首次或更新时需要)
+uv sync
+# 启动服务
+uv run main.py
 ```
 
-### 客户端配置
 
-创建 `mcp-client/.env` 文件：
 
-```env
-# Chainlit 配置
-CHAINLIT_CHAT_LLM=gpt-4
-CHAINLIT_HOST=0.0.0.0
-CHAINLIT_PORT=9003
-```
+## 添加自己的MCP Tool
 
-## 🔧 开发环境
+一个工作流即为提个MCP Tool
 
-- Python 3.11+
-- UV 包管理器
-- Docker & Docker Compose
+### 1. 添加最简单的MCP Tool
 
-## 📁 详细说明
+* 在ComfyUI中搭建一个实现图片高斯模糊的工作流（[点击获取](docs/i_blur_ui.json)），然后将 `LoadImage `节点的 title 改为 `$image.image!`，如下图；![](docs/easy-workflow.png)
 
-每个子项目都有独立的 README 和配置：
-- [mcp-client/README.md](mcp-client/README.md) - 客户端详细说明
-- [mcp-server/README.md](mcp-server/README.md) - 服务端详细说明
+* 然后将其导出为api格式文件，并重命名为 `i_blur.json`，你可以自己导出，也可以直接使用我们为你导出好的（[点击获取](docs/i_blur.json)）；
 
-## 🎯 功能特性
+* 复制导出的API格式工作流文件（注：务必是API格式的），在web页面输入，并LLM添加这个Tool；
 
-### MCP 客户端
-- 🌐 Web 界面聊天交互
-- 🔌 MCP 协议支持
-- 📎 文件上传处理
-- 🎨 多种 AIGC 工具集成
+  ![](docs/ready_to_send.png)
 
-### MCP 服务端
-- 🎨 **图像生成**: 文本转图像、图像编辑
-- 🔊 **语音合成**: Edge TTS 中文语音
-- 🖼️ **图像处理**: 裁剪、上传、格式转换
-- 📹 **视频生成**: 图像转视频
-- ☁️ **云存储**: MinIO 对象存储
+* 消息发送后，LLM会让将这个工作流自动转化为一个MCP Tool；
 
-## 🚀 快速体验
+  ![](docs/added_mcp.png)
 
-### 远程部署体验
+* 此时，刷新页面，再发送任意图片，即可实现基于LLM进行的高斯模糊处理；
 
-1. **配置SSH连接**
-   ```bash
-   # 确保可以SSH连接到服务器
-   ssh-copy-id user@server-ip
-   ```
+  ![](docs/use_mcp_tool.png)
 
-2. **设置环境变量**（可选）
-   ```bash
-   export REMOTE_HOST=your-server-ip
-   export REMOTE_USER=your-username
-   export PROJECT_DIR=/path/to/project
-   ```
+### 2. 添加复杂的MCP Tool
 
-3. **一键部署**
-   ```bash
-   ./redeploy.sh
-   ```
+添加MCP Tool的步骤和前面一样，唯一不一样的就是工作流部分（点击下载工作流：[UI格式](docs/t2i_by_flux_turbo_ui.json) 和 [API格式](docs/t2i_by_flux_turbo.json)）
 
-4. **访问服务**
-   - 打开浏览器访问: http://your-server-ip:9003
-   - 开始使用 AIGC 工具！
+![image-20250715202715435](/Users/puke/Library/Application Support/typora-user-images/image-20250715202715435.png)
 
-### 本地部署体验
 
-1. **克隆项目**
-   ```bash
-   git clone <repository-url>
-   cd pixelle-mcp
-   ```
 
-2. **配置环境**
-   ```bash
-   # 复制环境变量模板（如果需要）
-   cp mcp-server/.env.example mcp-server/.env
-   cp mcp-client/.env.example mcp-client/.env
-   ```
+## 更多自定义配置
 
-3. **启动服务**
-   ```bash
-   docker-compose up -d --build
-   ```
+<待补充>
 
-4. **访问服务**
-   - 打开浏览器访问: http://localhost:9003
-   - 开始使用 AIGC 工具！
+
+
+## 致谢
+
+衷心感谢以下所有组织、项目和团队，为本项目的发展和落地提供了支持。
+
+* ComfyUI
+* Chainlit
+* Minio
+* MCP
+* WanVideo
+* Flux
+
+
+
+## 如何参与共建
+
+<待补充>
+
