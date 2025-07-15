@@ -113,7 +113,7 @@ uv run main.py
 
 📊 添加MCP Tool的步骤和前面一样，唯一不一样的就是工作流部分（点击下载工作流：[UI格式](docs/t2i_by_flux_turbo_ui.json) 和 [API格式](docs/t2i_by_flux_turbo.json)）
 
-![image-20250715202715435](/Users/puke/Library/Application Support/typora-user-images/image-20250715202715435.png)
+![](docs/t2i_by_flux_turbo.png)
 
 
 
