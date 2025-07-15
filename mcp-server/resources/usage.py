@@ -35,4 +35,5 @@ def usage():
     """
     This is a usage prompt for all mcp tools about this mcp server.
     """
-    return USAGE.strip()
+    # return USAGE.strip()
+    return ""
