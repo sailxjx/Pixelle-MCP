@@ -53,7 +53,6 @@ services:
       - ./mcp-server/data:/app/data
     env_file:
       - ./mcp-server/.env
-      - ./mcp-server/.env.local
     healthcheck:
       test: ["CMD", "curl", "-f", "http://minio:9001/health"]
       interval: 1s
@@ -78,7 +77,6 @@ services:
       - ./mcp-client/.files:/app/.files
     env_file:
       - ./mcp-client/.env
-      - ./mcp-client/.env.local
     environment:
       - CHAINLIT_HOST=0.0.0.0
       - CHAINLIT_PORT=9003
