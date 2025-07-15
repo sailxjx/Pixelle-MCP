@@ -10,7 +10,8 @@ wheels/
 .venv
 
 temp
-.env*.local
+.env*
+!.env.example
 *.out
 *.log
 .files

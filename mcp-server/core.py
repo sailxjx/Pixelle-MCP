@@ -25,7 +25,6 @@ logger.setLevel(logger_level)
 # 加载环境变量
 ENV_PATH = [
     ".env",
-    ".env.local",
 ]
 for env_path in ENV_PATH:
     if os.path.exists(env_path):

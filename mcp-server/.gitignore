@@ -16,5 +16,6 @@ wheels/
 
 temp
 data
-.env*.local
+.env*
+!.env.example
 *.log
