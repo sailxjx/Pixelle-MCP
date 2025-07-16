@@ -90,7 +90,8 @@ uv run main.py
 
 ⚡ 一个工作流即为提个MCP Tool
 
-### 🎯 1. 添加最简单的MCP Tool
+<details>
+<summary>### 🎯 1. 添加最简单的MCP Tool</summary>
 
 * 📝 在ComfyUI中搭建一个实现图片高斯模糊的工作流（[点击获取](docs/i_blur_ui.json)），然后将 `LoadImage `节点的 title 改为 `$image.image!`，如下图
 ![](docs/easy-workflow.png)
@@ -108,6 +109,7 @@ uv run main.py
 * 🎨 此时，刷新页面，再发送任意图片，即可实现基于LLM进行的高斯模糊处理
 
   ![](docs/use_mcp_tool.png)
+</details>
 
 ### 🎛️ 2. 添加复杂的MCP Tool
 
