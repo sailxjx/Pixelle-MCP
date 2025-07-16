@@ -1,6 +1,6 @@
 # 🎨 Pixelle MCP
 
-> ✨ 基于 MCP 协议的 AIGC 方案，0代码将 ComfyUI 工作流转化为 Agent 工具，让 ComfyUI 成为 LLM 的翅膀。
+> ✨ 基于 MCP 协议的 AIGC 方案，0代码将 ComfyUI 工作流转化为 Agent 工具，让 LLM 与 ComfyUI 强强联合。
 
 <效果演示 | 待补充>
 
