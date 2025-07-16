@@ -7,28 +7,30 @@
 ## 📁 项目结构
 
 - **mcp-client**: 🌐 MCP 客户端，基于 Chainlit 构建的 Web 界面
-- **mcp-server**: ⚙️ MCP 服务端，提供各种 AIGC 工具和服务
+- **mcp-server**: 🗄️ MCP 服务端，提供各种 AIGC 工具和服务
 
 ## 🚀 功能特性
 
 - [x] 🔄 支持TISV（Text、Image、Sound/Speech、Video）全模态的互转和生成
-- [x] 🎛️ 底层基于 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 实现，继承 ComfyUI 的开放生态下的所有能力
+- [x] 🧩 底层基于[ComfyUI](https://github.com/comfyanonymous/ComfyUI)实现，继承ComfyUI的开放生态下的所有能力
 - [x] 🔧 制定并实现了 Workflow 即 MCP Tool 的方案，0代码开发，即可动态添加新的 MCP Tool
-- [x] 🔌 server端基于 [MCP](https://modelcontextprotocol.io/introduction) 协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
-- [x] 💻 client端基于 [Chaintlit](https://github.com/Chainlit/chainlit) 框架开发，继承了 Chainlit 的UI交互控件，支持集成更多的MCP Server
+- [x] 🔌 server端基于[MCP](https://modelcontextprotocol.io/introduction)协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
+- [x] 💻 client端基于[Chaintlit](https://github.com/Chainlit/chainlit)框架开发，继承了Chainlit的UI交互控件，支持集成更多的MCP Server
 
 
 
 ## 🏃‍♂️ 快速开始
 
-### 📥 1. 克隆仓库源码
+### 📥 1. 克隆源码 & 更改配置
+
+#### 📦 1.1 克隆源码
 
 ```shell
 git clone https://github.com/AIDC-AI/Pixelle-MCP.git
 cd Pixelle-MCP
 ```
 
-### ⚙️ 2. 完成关键配置
+#### 🗄️ 1.2 更改服务端配置
 
 ```shell
 cd mcp-server
@@ -36,10 +38,24 @@ cp .env.example .env
 # 按需更改.env的配置
 ```
 
+#### 🌐 1.3 更改客户端配置
+
 ```shell
 cd mcp-client
 cp .env.example .env
 # 按需更改.env的配置
+```
+
+### 🔧 2. 添加MCP Tool（可选）
+
+这一步是可选的，只会决定你Agent的能力，不影响正常对话，如果你暂时不需要，可以先跳过。
+
+`mcp-server/workflows`中是我们默认提供的一套目前比较热门的工作流，运行如下命令可以将其拷贝到你的mcp-server中，服务启动时会自动将其转化为MCP Tool，供大模型调用。
+
+**注：这里强烈建议在拷贝之前，先将工作流拖进你的ComfyUI画布试运行，以防后续调用过程中执行失败。**
+
+```shell
+cp -r  mcp-server/workflows mcp-server/data/custom_workflows
 ```
 
 ### 🚀 3. 启动服务
@@ -53,8 +69,8 @@ docker compose --profile all up -d
 运行完成之后，对应这几个服务都会开启：
 
 - **客户端**: 🌐 http://localhost:9003 (Chainlit Web UI)
-- **服务端**: 🖥️ http://localhost:9002 (MCP Server)
-- **MinIO**: 🗄️ http://localhost:9001 (对象存储管理界面)
+- **服务端**: 🗄️ http://localhost:9002 (MCP Server)
+- **MinIO**: 📦 http://localhost:9001 (对象存储管理界面)
 
 #### 🛠️ 3.2 源码方式启动
 
@@ -62,18 +78,18 @@ a. 📦 自行运行 [minio](https://github.com/minio/minio) 服务
 
 b. 🐍 安装 [uv](https://github.com/astral-sh/uv) 环境
 
-c. 🚀 启动服务端
+c. 🗄️ 启动服务端
 
-```shell
-# 进入目录
-cd mcp-server
-# 安装依赖 (仅首次或更新时需要)
-uv sync
-# 启动服务
-uv run main.py
-```
+     ```shell
+     # 进入目录
+     cd mcp-server
+     # 安装依赖 (仅首次或更新时需要)
+     uv sync
+     # 启动服务
+     uv run main.py
+     ```
 
-d. 💻 启动客户端
+d. 🌐 启动客户端
 
 ```shell
 # 进入目录
@@ -90,8 +106,7 @@ uv run main.py
 
 ⚡ 一个工作流即为提个MCP Tool
 
-<details>
-<summary><h3>🎯 1. 添加最简单的MCP Tool</h3></summary>
+### 🎯 1. 添加最简单的MCP Tool
 
 * 📝 在ComfyUI中搭建一个实现图片高斯模糊的工作流（[点击获取](docs/i_blur_ui.json)），然后将 `LoadImage `节点的 title 改为 `$image.image!`，如下图
 ![](docs/easy-workflow.png)
@@ -109,15 +124,12 @@ uv run main.py
 * 🎨 此时，刷新页面，再发送任意图片，即可实现基于LLM进行的高斯模糊处理
 
   ![](docs/use_mcp_tool.png)
-</details>
 
-<details>
-<summary><h3>🎛️ 2. 添加复杂的MCP Tool</h3></summary>
+### 🔌 2. 添加复杂的MCP Tool
 
 📊 添加MCP Tool的步骤和前面一样，唯一不一样的就是工作流部分（点击下载工作流：[UI格式](docs/t2i_by_flux_turbo_ui.json) 和 [API格式](docs/t2i_by_flux_turbo.json)）
 
 ![](docs/t2i_by_flux_turbo.png)
-</details>
 
 
 ## 🔧 更多自定义配置
@@ -130,12 +142,12 @@ uv run main.py
 
 ❤️ 衷心感谢以下所有组织、项目和团队，为本项目的发展和落地提供了支持。
 
-* 🎛️ ComfyUI
-* 💬 Chainlit
-* 🗄️ Minio
-* 🔌 MCP
-* 🎬 WanVideo
-* ⚡ Flux
+* 🧩 [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
+* 💬 [Chainlit](https://github.com/Chainlit/chainlit)
+* 🗄️ [Minio](https://github.com/minio/minio)
+* 🔌 [MCP](https://modelcontextprotocol.io/introduction)
+* 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
+* ⚡ [Flux](https://github.com/black-forest-labs/flux)
 
 
 
