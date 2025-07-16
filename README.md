@@ -91,9 +91,7 @@ uv run main.py
 ⚡ 一个工作流即为提个MCP Tool
 
 <details>
-<summary>
-### 🎯 1. 添加最简单的MCP Tool
-</summary>
+<summary><h3>1. 添加最简单的MCP Tool</h3></summary>
 
 * 📝 在ComfyUI中搭建一个实现图片高斯模糊的工作流（[点击获取](docs/i_blur_ui.json)），然后将 `LoadImage `节点的 title 改为 `$image.image!`，如下图
 ![](docs/easy-workflow.png)
