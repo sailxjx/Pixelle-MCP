@@ -91,7 +91,7 @@ uv run main.py
 ⚡ 一个工作流即为提个MCP Tool
 
 <details>
-<summary><h3>1. 添加最简单的MCP Tool</h3></summary>
+<summary><h3>🎯 1. 添加最简单的MCP Tool</h3></summary>
 
 * 📝 在ComfyUI中搭建一个实现图片高斯模糊的工作流（[点击获取](docs/i_blur_ui.json)），然后将 `LoadImage `节点的 title 改为 `$image.image!`，如下图
 ![](docs/easy-workflow.png)
@@ -111,12 +111,13 @@ uv run main.py
   ![](docs/use_mcp_tool.png)
 </details>
 
-### 🎛️ 2. 添加复杂的MCP Tool
+<details>
+<summary><h3>🎛️ 2. 添加复杂的MCP Tool</h3></summary>
 
 📊 添加MCP Tool的步骤和前面一样，唯一不一样的就是工作流部分（点击下载工作流：[UI格式](docs/t2i_by_flux_turbo_ui.json) 和 [API格式](docs/t2i_by_flux_turbo.json)）
 
 ![](docs/t2i_by_flux_turbo.png)
-
+</details>
 
 
 ## 🔧 更多自定义配置
