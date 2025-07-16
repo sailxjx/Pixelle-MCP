@@ -4,7 +4,7 @@
 
 <p align="center"><a href="README.md">中文</a> | <b>English</b></p>
 
-<Demo | To be added>
+<p align="center"><Demo | To be added></p>
 
 ## 📁 Project Structure
 

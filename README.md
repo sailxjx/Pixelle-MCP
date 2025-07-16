@@ -4,7 +4,7 @@
 
 <p align="center"><b>中文</b> | <a href="README_EN.md">English</a></p>
 
-<效果演示 | 待补充>
+<p align="center"><效果演示 | 待补充></p>
 
 ## 📁 项目结构
 
