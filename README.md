@@ -153,5 +153,44 @@ uv run main.py
 
 ## 🤝 如何参与共建
 
-<待补充>
+我们欢迎所有形式的贡献！无论您是开发者、设计师还是用户，都可以通过以下方式参与项目建设：
+
+### 🐛 报告问题
+* 📋 在 [Issues](https://github.com/AIDC-AI/Pixelle-MCP/issues) 页面提交 Bug 报告
+* 🔍 提交前请先搜索是否已有相似问题
+* 📝 请详细描述问题的复现步骤和环境信息
+
+### 💡 功能建议
+* 🚀 在 [Issues](https://github.com/AIDC-AI/Pixelle-MCP/issues) 中提交功能请求
+* 💭 描述您希望添加的功能及其使用场景
+* 🎯 解释该功能如何改善用户体验
+
+### 🔧 代码贡献
+
+#### 📋 贡献流程
+1. 🍴 Fork 本仓库到您的 GitHub 账户
+2. 🌿 创建功能分支：`git checkout -b feature/your-feature-name`
+3. 💻 进行开发并添加相应的测试
+4. 📝 提交更改：`git commit -m "feat: add your feature"`
+5. 📤 推送到您的仓库：`git push origin feature/your-feature-name`
+6. 🔄 创建 Pull Request 到主仓库
+
+#### 🎨 代码规范
+* 🐍 Python 代码遵循 [PEP 8](https://pep8.org/) 规范
+* 📖 为新功能添加适当的文档和注释
+
+### 🧩 贡献工作流
+* 📦 分享您的 ComfyUI 工作流到社区
+* 🛠️ 提交经过测试的工作流文件
+* 📚 为工作流添加使用说明和示例
+
+### 💬 社区交流
+* 🎯 参与 [Discussions](https://github.com/AIDC-AI/Pixelle-MCP/discussions) 讨论
+* 💡 分享使用经验和最佳实践
+* 🤝 帮助其他用户解决问题
+
+### 📋 开发环境
+参考 [快速开始](#-快速开始) 部分搭建开发环境，推荐使用源码方式启动进行开发调试。
+
+感谢您对 Pixelle MCP 项目的关注和支持！🙏
 
