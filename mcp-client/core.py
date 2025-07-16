@@ -11,7 +11,7 @@ logging.basicConfig(
     force=True  # 强制重新配置，覆盖已有配置
 )
 
-logger = logging.getLogger("AMC")
+logger = logging.getLogger("PMC")
 logger.setLevel(logger_level)
 
 logging.getLogger("httpx").setLevel(logging.WARNING)

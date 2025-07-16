@@ -19,7 +19,7 @@ logging.basicConfig(
     force=True  # 强制重新配置，覆盖已有配置
 )
 
-logger = logging.getLogger("AM")
+logger = logging.getLogger("PMS")
 logger.setLevel(logger_level)
 
 # 加载环境变量
