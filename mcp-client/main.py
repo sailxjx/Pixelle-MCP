@@ -5,11 +5,9 @@ import llm_util
 from message_converter import messages_from_chaintlit_to_openai
 import starters
 import auth
-import os
 
 from core import logger
-from openai import OpenAI
-from prompt import SYSTEM_MESSAGE
+from prompt import DEFAULT_SYSTEM_PROMPT
 from tool_converter import tools_from_chaintlit_to_openai
 from chat_handler import handle_mcp_connect, handle_mcp_disconnect
 from chat_settings import setup_chat_settings, setup_settings_update
@@ -38,9 +36,13 @@ async def start():
     """初始化聊天会话"""
     await setup_chat_settings()
     
+    # 从settings中获取系统提示词，如果没有则使用默认值
+    settings = cl.user_session.get("settings", {})
+    system_prompt = settings.get("system_prompt", DEFAULT_SYSTEM_PROMPT)
+    
     sys_message = cl.Message(
         type="system_message",
-        content=SYSTEM_MESSAGE
+        content=system_prompt
     )
     cl.chat_context.add(sys_message)
     
@@ -54,15 +56,15 @@ async def on_mcp(connection: McpConnection, session: ClientSession) -> None:
     await handle_mcp_connect(connection, session, tools_from_chaintlit_to_openai)
     cl.user_session.set("mcp_session", session)
     
-    # pixelle-mcp单独适配
-    if connection.name == "pixelle-mcp":
-        result_resource = await session.read_resource("usage://tools")
-        usage_tools = result_resource.contents[0].text
-        if usage_tools:
-            cl_messages = cl.chat_context.get()
-            if usage_tools not in cl_messages[0].content:
-                cl_messages[0].content = f"{SYSTEM_MESSAGE}\n\n{usage_tools}"
-                await cl_messages[0].update()
+    # TODO: pixelle-mcp工具使用说明相关代码，暂时注释保留
+    # if connection.name == "pixelle-mcp":
+    #     result_resource = await session.read_resource("usage://tools")
+    #     usage_tools = result_resource.contents[0].text
+    #     if usage_tools:
+    #         cl_messages = cl.chat_context.get()
+    #         if usage_tools not in cl_messages[0].content:
+    #             cl_messages[0].content = f"{system_prompt}\n\n{usage_tools}"
+    #             await cl_messages[0].update()
 
 
 @cl.on_mcp_disconnect

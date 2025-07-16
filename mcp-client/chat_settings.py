@@ -1,6 +1,8 @@
+import re
 from core import logger
 import chainlit as cl
 from chainlit.input_widget import Select, Switch, Slider, TextInput, Tags
+from prompt import DEFAULT_SYSTEM_PROMPT
 
 
 async def setup_chat_settings():
@@ -8,6 +10,13 @@ async def setup_chat_settings():
     
     settings = await cl.ChatSettings(
         [
+            TextInput(
+                id="system_prompt",
+                label="系统提示词",
+                initial=DEFAULT_SYSTEM_PROMPT,
+                multiline=True,
+                placeholder="请输入系统提示词，用于指导AI助手的行为和回复方式。",
+            ),
             # Tags(
             #     id="OpenAI_Models",
             #     label="OpenAI - Models",
@@ -19,13 +28,6 @@ async def setup_chat_settings():
             #     label="ComfyUI服务地址",
             #     initial="http://localhost:8188",
             #     placeholder="请输入ComfyUI的服务地址，如：http://localhost:8188",
-            # ),
-            # TextInput(
-            #     id="system_prompt",
-            #     label="系统提示词",
-            #     initial="",
-            #     multiline=True,
-            #     placeholder="请输入系统提示词，如：你是一个专业的客服，请根据用户的问题给出专业的回答。",
             # ),
             # Select(
             #     id="Default_OpenAI_Model",
@@ -80,9 +82,26 @@ async def setup_chat_settings():
             # ),
         ]
     ).send()
-    logger.info(f"chat settings: {settings}")
+    logger.debug(f"chat settings: {settings}")
 
 
 async def setup_settings_update(settings):
-    logger.info(f"on_settings_update: {settings}")
+    logger.debug(f"on_settings_update: {settings}")
     cl.user_session.set("settings", settings)
+    
+    await _update_system_prompt_if_need(settings)
+
+    
+async def _update_system_prompt_if_need(settings):
+    cl_messages = cl.chat_context.get()
+    if not cl_messages:
+        return
+    
+    first_message = cl_messages[0]
+    if first_message.type != "system_message":
+        return
+    
+    first_message.content = settings.get("system_prompt", DEFAULT_SYSTEM_PROMPT)
+    await first_message.update()
+    logger.info(f"update system prompt: {first_message.content}")
+

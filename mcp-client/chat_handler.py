@@ -12,37 +12,6 @@ from llm_util import ModelInfo
 from starters import build_save_action
 from time_util import format_duration
 
-# 严格的媒体显示系统指令
-SYSTEM_INSTRUCTION = """
-# 关于媒体显示的说明
-当工具返回包含媒体文件的结果时，如果媒体文件是用户想要看到的最终结果，请严格按照以下格式在回复的最后添加媒体标记：
-
-格式要求：
-1. 先完成你的正常文字回复
-2. 如果有需要显示的媒体文件，在文字回复结束后换行
-3. 每个媒体文件单独一行，格式为：
-   - 图片：[SHOW_IMAGE:图片URL或路径]
-   - 音频：[SHOW_AUDIO:音频URL或路径]
-   - 视频：[SHOW_VIDEO:视频URL或路径]
-4. 可以是网络URL或本地文件路径
-
-示例：
-我为你生成了销售数据分析图表和相关的讲解音频。从数据可以看出销量呈上升趋势，特别是在第三季度有显著增长。
-
-[SHOW_IMAGE:http://example.com/sales_chart.png]
-[SHOW_AUDIO:http://example.com/sales_explanation.mp3]
-
-如果还包含了视频演示：
-[SHOW_VIDEO:http://example.com/sales_demo.mp4]
-
-注意：
-- 只为最终的、用户需要查看的结果媒体文件添加此标记
-- 不要为中间处理步骤的媒体文件添加标记
-- 媒体标记必须放在回复的最后
-- 每个媒体标记单独一行
-- 支持的媒体类型：图片(IMAGE)、音频(AUDIO)、视频(VIDEO)
-"""
-
 def get_all_tools() -> List[Dict[str, Any]]:
     """获取所有可用的 MCP 工具"""
     mcp_tools = cl.user_session.get("mcp_tools", {})
@@ -155,21 +124,6 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any]) -> str:
         current_step.output = result_with_duration
         record_step()
         return result_with_duration
-
-
-def _inject_system_instruction(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """注入媒体显示的系统指令"""
-    messages_copy = messages.copy()
-    
-    if messages_copy and messages_copy[0]["role"] == "system":
-        # 检查是否已经包含完整的媒体显示指令，避免重复添加
-        if SYSTEM_INSTRUCTION not in messages_copy[0]["content"]:
-            messages_copy[0]["content"] += "\n\n" + SYSTEM_INSTRUCTION
-    else:
-        # 如果没有系统消息，插入新的系统消息
-        messages_copy.insert(0, {"role": "system", "content": SYSTEM_INSTRUCTION})
-    
-    return messages_copy
 
 
 def _extract_and_clean_media_markers(text: str) -> tuple[Dict[str, List[str]], str]:
@@ -490,7 +444,6 @@ async def process_streaming_response(
     tools = get_all_tools()
     
     # 注入媒体显示系统指令
-    enhanced_messages = _inject_system_instruction(messages)
     enhanced_messages = messages.copy()
     
     while True:  # 循环处理工具调用
