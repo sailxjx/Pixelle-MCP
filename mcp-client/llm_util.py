@@ -15,7 +15,7 @@ OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 CHAINLIT_CHAT_OPENAI_MODELS = os.getenv("CHAINLIT_CHAT_OPENAI_MODELS")
 
-openai_models = CHAINLIT_CHAT_OPENAI_MODELS.split(",")
+openai_models = [model.strip() for model in CHAINLIT_CHAT_OPENAI_MODELS.split(",") if model.strip()]
 logger.info(f"OPENAI_BASE_URL: {OPENAI_BASE_URL}")
 logger.info(f"OPENAI_API_KEY: {OPENAI_API_KEY}")
 logger.info(f"Found {len(openai_models)} OpenAI models: {openai_models}")
@@ -26,7 +26,7 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODELS = os.getenv("OLLAMA_MODELS")
 OLLAMA_API_KEY = "ollama"
 
-ollama_models = OLLAMA_MODELS.split(",")
+ollama_models = [model.strip() for model in OLLAMA_MODELS.split(",") if model.strip()]
 logger.info(f"OLLAMA_BASE_URL: {OLLAMA_BASE_URL}")
 logger.info(f"Found {len(ollama_models)} Ollama models: {ollama_models}")
 
