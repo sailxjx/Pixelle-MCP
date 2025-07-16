@@ -69,12 +69,12 @@ docker compose --profile all up -d
 运行完成之后，对应这几个服务都会开启：
 
 - **客户端**: 🌐 http://localhost:9003 (Chainlit Web UI)
-- **服务端**: 🗄️ http://localhost:9002 (MCP Server)
+- **服务端**: 🗄️ http://localhost:9002/sse (MCP Server)
 - **MinIO**: 📦 http://localhost:9001 (对象存储管理界面)
 
 #### 🛠️ 3.2 源码方式启动
 
-a. 📦 自行运行 [minio](https://github.com/minio/minio) 服务
+a. 📦 自行运行 [minio](https://github.com/minio/minio) 服务，并更改`mcp-client/.env`和`mcp-server/.env`中对应的Minio配置
 
 b. 🐍 安装 [uv](https://github.com/astral-sh/uv) 环境
 
