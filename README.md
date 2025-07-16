@@ -1,6 +1,6 @@
 # 🎨 Pixelle MCP
 
-> ✨ 这是一个基于 MCP (Model Context Protocol) 的 AIGC 工具集合项目，致力于打造AI生态的大一统解决方案。
+> ✨ 基于 MCP 协议的 AIGC 方案，0代码将 ComfyUI 工作流转化为 Agent 工具，让 ComfyUI 成为 LLM 的翅膀。
 
 <效果演示 | 待补充>
 
