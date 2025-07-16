@@ -52,7 +52,7 @@ cp .env.example .env
 
 `mcp-server/workflows`中是我们默认提供的一套目前比较热门的工作流，运行如下命令可以将其拷贝到你的mcp-server中，服务启动时会自动将其转化为MCP Tool，供大模型调用。
 
-**注：这里强烈建议在拷贝之前，先将工作流拖进你的ComfyUI画布试运行，以防后续调用过程中执行失败。**
+**注：这里强烈建议在拷贝之前，先将工作流拖进你的ComfyUI画布试运行，以确保后续调用过程中能够顺利执行。**
 
 ```shell
 cp -r mcp-server/workflows mcp-server/data/custom_workflows
