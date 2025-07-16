@@ -255,7 +255,7 @@ class WorkflowParser:
         
         return metadata
     
-    def parse_workflow_file(self, file_path: str, tool_name: str = None) -> Optional[WorkflowMetadata]:
+    def parse_workflow_file(self, file_path: str, tool_name: Optional[str] = None) -> Optional[WorkflowMetadata]:
         """解析工作流文件"""
         with open(file_path, 'r', encoding='utf-8') as f:
             workflow_data = json.load(f)

@@ -132,22 +132,100 @@ uv run main.py
 ![](docs/t2i_by_flux_turbo.png)
 
 
-## 🔧 更多自定义配置
+## 🔧 ComfyUI Workflow 自定义规范
 
-<待补充>
+### 🎨 工作流格式
+系统支持 ComfyUI 的工作流，只需要在画布中设计好工作流，然后导出为 API 格式即可。通过在节点标题中使用特殊语法来定义参数和输出。
+
+### 📝 参数定义规范
+
+在 ComfyUI 画布中，双击节点标题进行编辑，使用以下 DSL 语法定义参数：
+
+```
+$<参数名>.<字段名>[!][:<描述信息>]
+```
+
+#### 🔍 语法说明：
+- `参数名`：生成的MCP工具函数的参数名
+- `字段名`：节点中对应的输入字段名
+- `!`：表示该参数为必需参数
+- `描述信息`：参数的描述
+
+#### 💡 操作示例：
+
+**必需参数示例：**
+
+- LoadImage 节点标题设为：`$image.image!:输入图片URL`
+- 含义：创建名为 `image` 的必需参数，对应节点的 `image` 字段
+
+**可选参数示例：**
+
+- `EmptyLatentImage` 节点 title 设为：`$width.width:图片宽度，默认512`
+- 含义：创建名为 `width` 的可选参数，对应节点的 `width` 字段，默认值为节点中设置的 512
+
+### 🎯 类型推断规则
+
+系统会根据节点字段的当前值自动推断参数类型：
+- 🔢 `int` 类型：整数值（如 512, 1024）
+- 📊 `float` 类型：浮点数值（如 1.5, 3.14）
+- ✅ `bool` 类型：布尔值（如 true, false）
+- 📝 `str` 类型：字符串值（默认类型）
+
+### 📤 输出定义规范
+
+#### 🤖 方式1：自动识别输出节点
+系统会自动识别以下常见的输出节点：
+- 🖼️ `SaveImage` - 图片保存节点
+- 🎬 `SaveVideo` - 视频保存节点
+- 🔊 `SaveAudio` - 音频保存节点
+- 📹 `VHS_SaveVideo` - VHS视频保存节点
+- 🎵 `VHS_SaveAudio` - VHS音频保存节点
+
+#### 🎯 方式2：手动标记输出
+> 一般用在包含多个输出的场景
+在任意节点的标题中使用 `$output.变量名` 来标记输出：
+- 节点标题设为：`$output.result`
+- 系统会将此节点的输出作为工具的返回值
 
 
 
-## 🙏 致谢
+### 📄 工具描述配置（可选）
 
-❤️ 衷心感谢以下所有组织、项目和团队，为本项目的发展和落地提供了支持。
+可以在工作流中添加一个标题为 `MCP` 的节点来提供工具描述：
 
-* 🧩 [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
-* 💬 [Chainlit](https://github.com/Chainlit/chainlit)
-* 🗄️ [Minio](https://github.com/minio/minio)
-* 🔌 [MCP](https://modelcontextprotocol.io/introduction)
-* 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
-* ⚡ [Flux](https://github.com/black-forest-labs/flux)
+1. 添加一个 `easy string` 或类似的文本节点
+2. 将节点标题设为：`MCP`
+3. 在节点的值字段中输入工具的详细描述
+
+### 🎨 完整操作示例
+
+以图片模糊处理工具为例：
+
+1. **📥 添加LoadImage节点**
+   - 设置默认图片
+   - 修改标题为：`$image.image!:需要处理的图片URL`
+
+2. **🌀 添加ImageBlur节点**
+   - 连接LoadImage的输出
+   - 设置模糊半径为 15
+   - 修改标题为：`$blur_radius.blur_radius:模糊半径，值越大越模糊`
+
+3. **💾 添加SaveImage节点**
+   - 连接ImageBlur的输出
+   - 标题保持 `Save Image`（系统自动识别）
+
+4. **📝 添加描述节点（可选）**
+   - 添加 `easy string` 节点
+   - 标题设为：`MCP`
+   - 值设为：`图片模糊处理工具，可以对输入图片进行高斯模糊处理`
+
+### ⚠️ 重要注意事项
+
+1. **🔒 参数验证**：标记为可选的参数（没有!符号）必须在节点中设置默认值
+2. **🔗 节点连接**：已连接到其他节点的字段不会被解析为参数
+3. **🏷️ 工具命名**：导出的文件名将作为工具名称，建议使用有意义的英文名称
+4. **📋 描述详细**：尽量在参数描述中提供详细说明，提升用户体验
+5. **🎯 导出格式**：必须导出为 API 格式，不要导出 UI 格式
 
 
 
@@ -194,3 +272,14 @@ uv run main.py
 
 感谢您对 Pixelle MCP 项目的关注和支持！🙏
 
+
+## 🙏 致谢
+
+❤️ 衷心感谢以下所有组织、项目和团队，为本项目的发展和落地提供了支持。
+
+* 🧩 [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
+* 💬 [Chainlit](https://github.com/Chainlit/chainlit)
+* 🗄️ [Minio](https://github.com/minio/minio)
+* 🔌 [MCP](https://modelcontextprotocol.io/introduction)
+* 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
+* ⚡ [Flux](https://github.com/black-forest-labs/flux)
