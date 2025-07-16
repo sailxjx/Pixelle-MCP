@@ -85,8 +85,14 @@ def get_default_model() -> Union[ModelInfo, None]:
             return model_info
     return None
 
-def get_model_info_by_name(name: str) -> Union[ModelInfo, None]:
-    for model_info in get_all_models():
-        if model_info.name == name:
-            return model_info
+def get_model_info_by_name(name: str | None) -> ModelInfo:
+    if name:
+        for model_info in get_all_models():
+            if model_info.name == name:
+                return model_info
+    
+    default_model = get_default_model()
+    if default_model:
+        return default_model
+
     raise ValueError(f"Model `{name}` not found")
