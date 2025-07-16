@@ -55,7 +55,7 @@ cp .env.example .env
 **注：这里强烈建议在拷贝之前，先将工作流拖进你的ComfyUI画布试运行，以防后续调用过程中执行失败。**
 
 ```shell
-cp -r  mcp-server/workflows mcp-server/data/custom_workflows
+cp -r mcp-server/workflows mcp-server/data/custom_workflows
 ```
 
 ### 🚀 3. 启动服务
