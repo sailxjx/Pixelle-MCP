@@ -188,7 +188,7 @@ Use `$output.variable_name` in any node's title to mark output:
 
 You can add a node titled `MCP` in your workflow to provide tool description:
 
-1. Add an `easy string` or similar text node
+1. Add a `String (Multiline)` or similar text node (must comply with: single string attribute, and node field must be one of the following: value, text, string)
 2. Set node title to: `MCP`
 3. Enter detailed tool description in the node's value field
 
@@ -210,7 +210,7 @@ Using image blur processing tool as example:
    - Keep title as `Save Image` (automatically recognized by system)
 
 4. **📝 Add Description Node (Optional)**
-   - Add `easy string` node
+   - Add `String (Multiline)` node
    - Set title to: `MCP`
    - Set value to: `Image blur processing tool that applies Gaussian blur to input images`
 
