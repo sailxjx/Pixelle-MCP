@@ -28,7 +28,7 @@ RUN mkdir -p data/files
 EXPOSE 9001
 
 # 设置健康检查
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=2s --timeout=10s --start-period=3s --retries=5 \
     CMD curl -f http://localhost:9001/health || exit 1
 
 # 启动应用
