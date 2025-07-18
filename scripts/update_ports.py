@@ -210,6 +210,7 @@ def main():
     # 获取目录路径
     project_root = get_project_root()
     directories = [
+        project_root / "mcp-client" / "starters",
         project_root / "mcp-client" / "data" / "custom_starters",
         project_root / "mcp-server" / "data" / "custom_workflows"
     ]
