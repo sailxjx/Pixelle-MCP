@@ -36,15 +36,11 @@ load_modules("resources")
 load_modules("tools")
 
 if __name__ == "__main__":
-    try:
-        # 启动MCP服务器
-        print("🚀 启动 MCP 服务器...")
-        print("📁 监听目录:", workflow_manager.workflows_dir)
-        print("\n🌐 服务器启动中...")
-        
-        host = os.getenv("MCP_HOST", "127.0.0.1")
-        port = int(os.getenv("MCP_PORT", 9002))
-        mcp.run(transport="sse", port=port, host=host)
-    finally:
-        # 确保清理资源
-        workflow_manager.cleanup()
+    # 启动MCP服务器
+    print("🚀 启动 MCP 服务器...")
+    print("📁 监听目录:", workflow_manager.workflows_dir)
+    print("\n🌐 服务器启动中...")
+    
+    host = os.getenv("MCP_HOST", "127.0.0.1")
+    port = int(os.getenv("MCP_PORT", 9002))
+    mcp.run(transport="sse", port=port, host=host)

@@ -17,3 +17,7 @@ temp
 redeploy.sh
 
 .idea
+
+# 运行时生成的文件
+.pids
+logs/
