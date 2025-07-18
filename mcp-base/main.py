@@ -111,7 +111,8 @@ async def get_file_info(file_id: str):
     return file_info
 
 
-@app.delete(f"/files/{{file_id}}")
+# 暂不开放, 防止数据丢失
+# @app.delete(f"/files/{{file_id}}")
 async def delete_file(file_id: str):
     """
     删除文件
