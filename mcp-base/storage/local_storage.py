@@ -18,7 +18,7 @@ class LocalStorage(StorageBackend):
     
     def __init__(self, storage_path: Optional[str] = None, base_url: Optional[str] = None):
         self.storage_path = Path(storage_path or settings.local_storage_path)
-        self.base_url = base_url or f"http://{settings.host}:{settings.port}"
+        self.base_url = base_url or settings.get_base_url()
         
         # 确保存储目录存在
         self.storage_path.mkdir(parents=True, exist_ok=True)

@@ -8,6 +8,8 @@ services:
       - "9001:9001"
     volumes:
       - ./mcp-base/data:/app/data
+    env_file:
+      - ./mcp-base/.env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
       interval: 30s

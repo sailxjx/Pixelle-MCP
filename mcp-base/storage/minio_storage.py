@@ -48,7 +48,7 @@ class MinioStorage(StorageBackend):
             if not self.client.bucket_exists(self.bucket):
                 self.client.make_bucket(self.bucket)
         except S3Error as e:
-            print(f"Error creating bucket: {e}")
+            print(f"Error creating bucket {self.bucket}: {e}")
     
     def _generate_file_id(self, filename: str) -> str:
         """生成唯一的文件ID"""
@@ -59,8 +59,12 @@ class MinioStorage(StorageBackend):
     
     def _get_file_url(self, file_id: str) -> str:
         """获取文件的访问URL"""
-        protocol = "https" if self.secure else "http"
-        return f"{protocol}://{self.endpoint}/{self.bucket}/{file_id}"
+        # 优先使用配置的PUBLIC_READ_URL，否则根据MinIO配置生成
+        if settings.public_read_url:
+            return f"{settings.public_read_url}/files/{file_id}"
+        else:
+            protocol = "https" if self.secure else "http"
+            return f"{protocol}://{self.endpoint}/{self.bucket}/{file_id}"
     
     async def upload(
         self, 

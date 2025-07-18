@@ -3,10 +3,15 @@
 支持多种存储后端的配置
 """
 
+import os
 from enum import Enum
 from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 
 class StorageType(str, Enum):
@@ -22,9 +27,12 @@ class Settings(BaseSettings):
     # 服务基础配置
     app_name: str = "Pixelle Base Service"
     app_version: str = "0.1.0"
-    host: str = "0.0.0.0"
-    port: int = 9001
     debug: bool = False
+    
+    # 服务器配置
+    base_server_host: str = "127.0.0.1"
+    base_server_port: int = 9001
+    public_read_url: Optional[str] = None  # 公开访问的URL，用于文件访问
     
     # 存储配置
     storage_type: StorageType = StorageType.LOCAL
@@ -50,6 +58,23 @@ class Settings(BaseSettings):
     
     # API配置
     cors_origins: list[str] = ["*"]
+    
+    # 兼容性属性
+    @property
+    def host(self) -> str:
+        """兼容性属性，返回base_server_host"""
+        return self.base_server_host
+    
+    @property
+    def port(self) -> int:
+        """兼容性属性，返回base_server_port"""
+        return self.base_server_port
+    
+    def get_base_url(self) -> str:
+        """获取基础URL，优先使用PUBLIC_READ_URL，否则根据host:port构建"""
+        if self.public_read_url:
+            return self.public_read_url
+        return f"http://{self.base_server_host}:{self.base_server_port}"
     
     class Config:
         env_file = ".env"
