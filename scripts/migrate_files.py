@@ -22,11 +22,15 @@ def scan_minio_files(minio_dir: Path, minio_base_url: str) -> List[Tuple[str, st
     扫描 MinIO 目录获取文件名，并构造下载URL
     
     Args:
-        minio_dir: MinIO 本地目录（用于扫描文件名）
+        minio_dir: MinIO 本地目录（用于扫描文件夹名）
         minio_base_url: MinIO HTTP 基础URL
         
     Returns:
         List[Tuple[str, str]]: [(下载URL, 本地文件名), ...]
+        
+    Note:
+        MinIO存储机制：xxx.png文件会以xxx.png文件夹形式存在，
+        真实内容通过 http://host/files/xxx.png 访问
     """
     files = []
     
@@ -37,23 +41,16 @@ def scan_minio_files(minio_dir: Path, minio_base_url: str) -> List[Tuple[str, st
     print(f"📁 扫描 MinIO 目录: {minio_dir}")
     print(f"🌐 MinIO 基础URL: {minio_base_url}")
     
-    # 遍历所有文件
-    for item in minio_dir.rglob("*"):
-        if item.is_file():
-            # 获取相对于 minio/files 的路径作为文件名
-            relative_path = item.relative_to(minio_dir)
-            
-            # 对于目录形式的文件（如 004a1cddf60a4013b3c7a2c92570a64c.png/data）
-            # 文件名应该是目录名（去掉/data部分）
-            if relative_path.name == "data" and len(relative_path.parts) > 1:
-                filename = relative_path.parts[0]  # 使用父目录名作为文件名
-            else:
-                filename = str(relative_path).replace("/", "_")  # 直接文件的情况
+    # 只遍历一级子文件夹，文件夹名即为文件ID
+    for item in minio_dir.iterdir():
+        if item.is_dir():
+            # 文件夹名就是文件ID/文件名
+            file_id = item.name
             
             # 构造下载URL
-            download_url = f"{minio_base_url.rstrip('/')}/files/{filename}"
-            files.append((download_url, filename))
-            print(f"  📄 发现文件: {filename}")
+            download_url = f"{minio_base_url.rstrip('/')}/files/{file_id}"
+            files.append((download_url, file_id))
+            print(f"  📄 发现文件: {file_id}")
             print(f"      📥 下载URL: {download_url}")
     
     print(f"✅ 共发现 {len(files)} 个文件")
