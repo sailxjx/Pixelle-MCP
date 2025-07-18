@@ -15,29 +15,29 @@
         "width": 512,
         "height": 512
       },
-      "output": "Generated successfully, images: ['http://30.150.44.149:9000/files/4d54d478629141eb8b93b45b1fed021d.png']"
+      "output": "Generated successfully, images: ['http://30.150.44.149:9001/files/4d54d478629141eb8b93b45b1fed021d.png']"
     },
     {
       "role": "ai",
       "type": "step",
       "name": "i2i_by_flux_kontext_pro",
       "input": {
-        "image": "http://30.150.44.149:9000/files/4d54d478629141eb8b93b45b1fed021d.png",
+        "image": "http://30.150.44.149:9001/files/4d54d478629141eb8b93b45b1fed021d.png",
         "prompt": "Add the word 'Pawtist' as a bold title at the top of the image."
       },
-      "output": "Generated successfully, images: ['http://30.150.44.149:9000/files/0f6f15eee9514abf9863fb684691d5c5.png']"
+      "output": "Generated successfully, images: ['http://30.150.44.149:9001/files/0f6f15eee9514abf9863fb684691d5c5.png']"
     },
     {
       "role": "ai",
       "type": "step",
       "name": "i2v_by_kling_start_frame",
       "input": {
-        "image": "http://30.150.44.149:9000/files/0f6f15eee9514abf9863fb684691d5c5.png",
+        "image": "http://30.150.44.149:9001/files/0f6f15eee9514abf9863fb684691d5c5.png",
         "prompt": "让这只小狗开心地跳跃起来，尾巴摇摆，周围的环境充满活力与欢快的氛围。",
         "model_name": "kling-v1-6",
         "mode": "std"
       },
-      "output": "Generated successfully, videos: ['http://30.150.44.149:9000/files/4b84a9077e7841c69e2fa8bf7be621ba.mp4']"
+      "output": "Generated successfully, videos: ['http://30.150.44.149:9001/files/4b84a9077e7841c69e2fa8bf7be621ba.mp4']"
     },
     {
       "role": "ai",
@@ -47,7 +47,7 @@
         "text": "这是一只活泼可爱的小狗，带着灿烂的笑容跳跃在温馨的室内环境中，展现出无限的欢乐与能量。",
         "voice": "zh-CN-YunxiNeural"
       },
-      "output": "文本转语音成功，音频文件: http://30.150.44.149:9000/files/b1f54c00c11b4a89b9eca4ae11bf560c.mp3"
+      "output": "文本转语音成功，音频文件: http://30.150.44.149:9001/files/b1f54c00c11b4a89b9eca4ae11bf560c.mp3"
     },
     {
       "role": "ai",
@@ -56,17 +56,17 @@
       "elements": [
         {
           "type": "image",
-          "url": "http://30.150.44.149:9000/files/0f6f15eee9514abf9863fb684691d5c5.png",
+          "url": "http://30.150.44.149:9001/files/0f6f15eee9514abf9863fb684691d5c5.png",
           "size": "small"
         },
         {
           "type": "audio",
-          "url": "http://30.150.44.149:9000/files/b1f54c00c11b4a89b9eca4ae11bf560c.mp3",
+          "url": "http://30.150.44.149:9001/files/b1f54c00c11b4a89b9eca4ae11bf560c.mp3",
           "size": "small"
         },
         {
           "type": "video",
-          "url": "http://30.150.44.149:9000/files/4b84a9077e7841c69e2fa8bf7be621ba.mp4",
+          "url": "http://30.150.44.149:9001/files/4b84a9077e7841c69e2fa8bf7be621ba.mp4",
           "size": "small"
         }
       ]
