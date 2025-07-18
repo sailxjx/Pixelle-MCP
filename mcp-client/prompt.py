@@ -9,9 +9,9 @@ DEFAULT_SYSTEM_PROMPT = """
 1. 先完成你的正常文字回复
 2. 如果有需要显示的媒体文件，在文字回复结束后换行
 3. 每个媒体文件单独一行，格式为：
-   - 图片：[SHOW_IMAGE:图片URL或路径]
-   - 音频：[SHOW_AUDIO:音频URL或路径]
-   - 视频：[SHOW_VIDEO:视频URL或路径]
+[SHOW_IMAGE:图片URL或路径]
+[SHOW_AUDIO:音频URL或路径]
+[SHOW_VIDEO:视频URL或路径]
 4. 可以是网络URL或本地文件路径
 
 注意：
