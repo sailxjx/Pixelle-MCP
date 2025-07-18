@@ -2,7 +2,7 @@ import json
 from pydantic import Field
 from core import mcp, logger
 from PIL import Image
-from utils.upload_util import upload
+from utils.file_uploader import upload
 from utils.file_util import download_files, create_temp_file
 
 @mcp.tool

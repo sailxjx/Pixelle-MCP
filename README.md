@@ -8,6 +8,7 @@
 
 ## 📁 项目结构
 
+- **mcp-base**: 🔧 基础服务，提供文件存储和共用服务能力
 - **mcp-client**: 🌐 MCP 客户端，基于 Chainlit 构建的 Web 界面
 - **mcp-server**: 🗄️ MCP 服务端，提供各种 AIGC 工具和服务
 
@@ -18,6 +19,10 @@
 - [x] 🔧 制定并实现了 Workflow 即 MCP Tool 的方案，0代码开发，即可动态添加新的 MCP Tool
 - [x] 🔌 server端基于[MCP](https://modelcontextprotocol.io/introduction)协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
 - [x] 💻 client端基于[Chaintlit](https://github.com/Chainlit/chainlit)框架开发，继承了Chainlit的UI交互控件，支持集成更多的MCP Server
+- [x] 🏗️ **新架构**: 三层架构设计（mcp-base + mcp-server + mcp-client），职责清晰，扩展性强
+- [x] 📦 **零依赖模式**: 支持本地文件存储，无需MinIO，一键启动
+- [x] 🔄 **灵活部署**: 支持多种存储后端（本地/MinIO），可根据需求选择部署方式
+- [x] 🌐 **国内友好**: 解决Docker网络问题，降低部署门槛
 
 
 
@@ -62,17 +67,33 @@ cp -r mcp-server/workflows mcp-server/data/custom_workflows
 
 ### 🚀 3. 启动服务
 
-#### 🐳 3.1 Docker方式启动（推荐）
+#### 🎯 3.1 简化启动（推荐，零外部依赖）
 
 ```shell
-docker compose --profile all up -d
+# 使用本地文件存储，无需MinIO
+./scripts/start-simple.sh
+```
+
+#### 🐳 3.2 完整启动（包含MinIO）
+
+```shell
+# 使用MinIO对象存储，适合生产环境
+./scripts/start-full.sh
+```
+
+#### 📋 3.3 停止服务
+
+```shell
+# 停止所有服务
+./scripts/stop.sh
 ```
 
 运行完成之后，对应这几个服务都会开启：
 
 - **客户端**: 🌐 http://localhost:9003 (Chainlit Web UI)
-- **服务端**: 🗄️ http://localhost:9002/sse (MCP Server)
-- **MinIO**: 📦 http://localhost:9001 (对象存储管理界面)
+- **服务端**: 🗄️ http://localhost:9002 (MCP Server)
+- **基础服务**: 🔧 http://localhost:9001 (文件存储和基础API)
+- **MinIO**: 📦 http://localhost:9090 (对象存储管理界面，仅完整模式)
 
 #### 🛠️ 3.2 源码方式启动
 
@@ -274,6 +295,37 @@ $<参数名>.<字段名>[!][:<描述信息>]
 
 感谢您对 Pixelle MCP 项目的关注和支持！🙏
 
+## 🏗️ 架构说明
+
+### 新三层架构
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   mcp-client    │    │   mcp-server    │    │    mcp-base     │
+│                 │    │                 │    │                 │
+│ • Chainlit UI  │────│ • MCP协议服务   │────│ • 文件存储      │
+│ • 用户交互      │    │ • 工具调用      │    │ • 基础API      │
+│ • 文件上传      │    │ • ComfyUI集成   │    │ • 存储抽象      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                       │
+                                              ┌────────┴────────┐
+                                              │                 │
+                                         本地存储          MinIO存储
+                                         (零依赖)          (生产级)
+```
+
+### 部署模式对比
+
+| 部署模式 | 命令 | 特点 | 适用场景 |
+|---------|------|------|----------|
+| 🎯 **简化模式** | `./scripts/start-simple.sh` | • 零外部依赖<br/>• 本地文件存储<br/>• 快速启动 | 开发、测试、小规模使用 |
+| 🐳 **完整模式** | `./scripts/start-full.sh` | • 分布式存储<br/>• S3兼容API<br/>• 高可用性 | 生产环境、大规模部署 |
+
+### 存储后端选择
+
+- **本地存储**: 适合开发和小规模使用，零配置，快速启动
+- **MinIO存储**: 适合生产环境，支持分布式，S3兼容API
+- **云存储**: 规划中，将支持阿里云OSS、腾讯云COS等
 
 ## 🙏 致谢
 

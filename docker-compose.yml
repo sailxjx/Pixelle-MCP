@@ -1,75 +1,45 @@
 version: '3.8'
 
 services:
-  # MinIO 对象存储（S3兼容）
-  minio:
-    image: minio/minio:latest
-    profiles: ["server", "all"]
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: ${MINIO_USERNAME:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minio1234}
+  # Pixelle 基础服务
+  mcp-base:
+    build: ./mcp-base
     ports:
-      - "9000:9000"  # API 端口
-      - "9001:9001"  # Web 控制台端口
+      - "9001:9001"
     volumes:
-      - ./mcp-server/data/minio:/data
+      - ./mcp-base/data:/app/data
+    env_file:
+      - ./mcp-base/.env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 1s
-      timeout: 20s
-      retries: 30
-      start_period: 2s
+      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
-
-  # MinIO 初始化（创建Bucket）
-  minio-init:
-    image: minio/mc:latest
-    profiles: ["server", "all"]
-    depends_on:
-      minio:
-        condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_USERNAME:-minio} ${MINIO_PASSWORD:-minio1234};
-      /usr/bin/mc mb myminio/${MINIO_BUCKET:-files} --ignore-existing;
-      /usr/bin/mc anonymous set public myminio/${MINIO_BUCKET:-files};
-      exit 0;
-      "
-    restart: "no"
 
   # Pixelle MCP 服务端
   mcp-server:
     build: ./mcp-server
-    profiles: ["server", "all"]
     depends_on:
-      minio:
+      mcp-base:
         condition: service_healthy
-      minio-init:
-        condition: service_completed_successfully
     ports:
       - "9002:9002"
     volumes:
       - ./mcp-server/data:/app/data
     env_file:
       - ./mcp-server/.env
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://minio:9001/health"]
-      interval: 1s
-      timeout: 20s
-      retries: 30
-      start_period: 2s
+    environment:
+      - MCP_BASE_URL=http://mcp-base:9001
     restart: unless-stopped
 
   # Pixelle MCP 客户端
   mcp-client:
     build: ./mcp-client
-    profiles: ["client", "all"]
     depends_on:
-      minio:
+      mcp-base:
         condition: service_healthy
-      minio-init:
-        condition: service_completed_successfully
     ports:
       - "9003:9003"
     volumes:
@@ -78,8 +48,7 @@ services:
     env_file:
       - ./mcp-client/.env
     environment:
-      - CHAINLIT_HOST=0.0.0.0
-      - CHAINLIT_PORT=9003
+      - MCP_BASE_URL=http://mcp-base:9001
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped 

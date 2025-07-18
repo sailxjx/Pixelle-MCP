@@ -1,0 +1,45 @@
+version: '3.8'
+
+networks:
+  minio-network:
+    driver: bridge
+
+services:
+  # MinIO 对象存储（mcp-base内部依赖）
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USERNAME:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minio1234}
+    ports:
+      - "9000:9000"  # API 端口
+      - "9090:9001"  # Web 控制台端口
+    volumes:
+      - ../data/minio:/data
+    networks:
+      - minio-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 1s
+      timeout: 20s
+      retries: 30
+      start_period: 2s
+    restart: unless-stopped
+
+  # MinIO 初始化（创建Bucket）
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - minio-network
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_USERNAME:-minio} ${MINIO_PASSWORD:-minio1234};
+      /usr/bin/mc mb myminio/${MINIO_BUCKET:-files} --ignore-existing;
+      /usr/bin/mc anonymous set public myminio/${MINIO_BUCKET:-files};
+      exit 0;
+      "
+    restart: "no" 

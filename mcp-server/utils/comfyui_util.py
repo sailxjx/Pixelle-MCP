@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field
 import aiohttp
 from core import logger
 from utils.file_util import download_files
-from utils.upload_util import upload
+from utils.file_uploader import upload
 
 # 配置变量
 COMFYUI_BASE_URL = os.getenv('COMFYUI_BASE_URL', 'http://127.0.0.1:8188')
@@ -74,10 +74,11 @@ class ExecuteResult(BaseModel):
                     output += format_media_output(media_type, media_list, by_var_dict)
             
             return output
-        elif self.status == "error":
-            return f"Generated failed, status: {self.status}, message: {self.msg}"
         else:
-            return f"Generated failed, status: {self.status}"
+            result = f"Generated failed, status: {self.status}"
+            if self.msg:
+                result += f", message: {self.msg}"
+            return result
 
 
 def transfer_result_files(result: ExecuteResult) -> ExecuteResult:

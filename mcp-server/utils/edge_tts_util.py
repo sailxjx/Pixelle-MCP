@@ -6,7 +6,7 @@ from typing import Optional, Literal
 from pydantic import BaseModel, Field
 import edge_tts
 from core import logger
-from utils.upload_util import upload
+from utils.file_uploader import upload
 
 
 class TtsResult(BaseModel):

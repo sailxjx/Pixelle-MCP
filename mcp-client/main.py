@@ -12,7 +12,7 @@ from tool_converter import tools_from_chaintlit_to_openai
 from chat_handler import handle_mcp_connect, handle_mcp_disconnect
 from chat_settings import setup_chat_settings, setup_settings_update
 import chat_handler as tool_handler
-from upload_util import upload
+from file_uploader import upload
 
 
 @cl.set_chat_profiles

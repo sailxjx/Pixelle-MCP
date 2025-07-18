@@ -1,0 +1,13 @@
+data
+temp
+.venv
+__pycache__
+*.bk
+*.log
+*.pyc
+.DS_Store
+.idea
+
+.env*
+!.env.example
+
