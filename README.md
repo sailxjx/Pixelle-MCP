@@ -20,7 +20,7 @@
 - [x] 🔌 server端基于[MCP](https://modelcontextprotocol.io/introduction)协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
 - [x] 💻 client端基于[Chaintlit](https://github.com/Chainlit/chainlit)框架开发，继承了Chainlit的UI交互控件，支持集成更多的MCP Server
 - [x] 🏗️ **新架构**: 三层架构设计（mcp-base + mcp-server + mcp-client），职责清晰，扩展性强
-- [x] 📦 **零依赖模式**: 支持本地文件存储，无需MinIO，一键启动
+- [x] 📦 **零依赖模式**: 支持本地文件存储，无需外部依赖，一键启动
 - [x] 🔄 **灵活部署**: 支持多种存储后端（本地/MinIO），可根据需求选择部署方式
 - [x] 🌐 **国内友好**: 解决Docker网络问题，降低部署门槛
 
@@ -37,7 +37,15 @@ git clone https://github.com/AIDC-AI/Pixelle-MCP.git
 cd Pixelle-MCP
 ```
 
-#### 🗄️ 1.2 更改服务端配置
+#### 🗄️ 1.2 更改基础服务配置
+
+```shell
+cd mcp-base
+cp .env.example .env
+# 按需更改.env的配置
+```
+
+#### 🗄️ 1.3 更改服务端配置
 
 ```shell
 cd mcp-server
@@ -45,7 +53,7 @@ cp .env.example .env
 # 按需更改.env的配置
 ```
 
-#### 🌐 1.3 更改客户端配置
+#### 🌐 1.4 更改客户端配置
 
 ```shell
 cd mcp-client
@@ -67,63 +75,58 @@ cp -r mcp-server/workflows mcp-server/data/custom_workflows
 
 ### 🚀 3. 启动服务
 
-#### 🎯 3.1 简化启动（推荐，零外部依赖）
+#### 🎯 3.1 Docker方式启动（推荐）
 
 ```shell
-# 使用本地文件存储，无需MinIO
-./scripts/start-simple.sh
+# 启动所有服务
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看服务日志
+docker-compose logs -f
 ```
 
-#### 🐳 3.2 完整启动（包含MinIO）
+#### 🛠️ 3.2 源码方式启动
 
+需要先安装 [uv](https://github.com/astral-sh/uv) 环境。
+
+**启动基础服务（mcp-base）**：
 ```shell
-# 使用MinIO对象存储，适合生产环境
-./scripts/start-full.sh
+cd mcp-base
+# 安装依赖（仅首次或更新时需要）
+uv sync
+# 启动服务
+uv run main.py
 ```
 
-#### 📋 3.3 停止服务
-
+**启动服务端（mcp-server）**：
 ```shell
-# 停止所有服务
-./scripts/stop.sh
+cd mcp-server
+# 安装依赖（仅首次或更新时需要）
+uv sync
+# 启动服务
+uv run main.py
 ```
 
-运行完成之后，对应这几个服务都会开启：
+**启动客户端（mcp-client）**：
+```shell
+cd mcp-client
+# 安装依赖（仅首次或更新时需要）
+uv sync
+# 启动服务
+uv run main.py
+```
+
+
+### 🌐 4. 访问服务
+
+启动完成后，各服务地址如下：
 
 - **客户端**: 🌐 http://localhost:9003 (Chainlit Web UI)
 - **服务端**: 🗄️ http://localhost:9002 (MCP Server)
 - **基础服务**: 🔧 http://localhost:9001 (文件存储和基础API)
-- **MinIO**: 📦 http://localhost:9090 (对象存储管理界面，仅完整模式)
-
-#### 🛠️ 3.2 源码方式启动
-
-a. 📦 自行运行 [minio](https://github.com/minio/minio) 服务，并更改`mcp-client/.env`和`mcp-server/.env`中对应的Minio配置
-
-b. 🐍 安装 [uv](https://github.com/astral-sh/uv) 环境
-
-c. 🗄️ 启动服务端
-
-```shell
-# 进入目录
-cd mcp-server
-# 安装依赖 (仅首次或更新时需要)
-uv sync
-# 启动服务
-uv run main.py
-```
-
-d. 🌐 启动客户端
-
-```shell
-# 进入目录
-cd mcp-client
-# 安装依赖 (仅首次或更新时需要)
-uv sync
-# 启动服务
-uv run main.py
-```
-
-
 
 ## 🛠️ 添加自己的MCP Tool
 
@@ -290,42 +293,6 @@ $<参数名>.<字段名>[!][:<描述信息>]
 * 💡 分享使用经验和最佳实践
 * 🤝 帮助其他用户解决问题
 
-### 📋 开发环境
-参考【快速开始】部分搭建开发环境，推荐使用源码方式启动进行开发调试。
-
-感谢您对 Pixelle MCP 项目的关注和支持！🙏
-
-## 🏗️ 架构说明
-
-### 新三层架构
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   mcp-client    │    │   mcp-server    │    │    mcp-base     │
-│                 │    │                 │    │                 │
-│ • Chainlit UI  │────│ • MCP协议服务   │────│ • 文件存储      │
-│ • 用户交互      │    │ • 工具调用      │    │ • 基础API      │
-│ • 文件上传      │    │ • ComfyUI集成   │    │ • 存储抽象      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-                                              ┌────────┴────────┐
-                                              │                 │
-                                         本地存储          MinIO存储
-                                         (零依赖)          (生产级)
-```
-
-### 部署模式对比
-
-| 部署模式 | 命令 | 特点 | 适用场景 |
-|---------|------|------|----------|
-| 🎯 **简化模式** | `./scripts/start-simple.sh` | • 零外部依赖<br/>• 本地文件存储<br/>• 快速启动 | 开发、测试、小规模使用 |
-| 🐳 **完整模式** | `./scripts/start-full.sh` | • 分布式存储<br/>• S3兼容API<br/>• 高可用性 | 生产环境、大规模部署 |
-
-### 存储后端选择
-
-- **本地存储**: 适合开发和小规模使用，零配置，快速启动
-- **MinIO存储**: 适合生产环境，支持分布式，S3兼容API
-- **云存储**: 规划中，将支持阿里云OSS、腾讯云COS等
 
 ## 🙏 致谢
 
