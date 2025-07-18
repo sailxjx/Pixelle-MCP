@@ -135,9 +135,9 @@ def _extract_and_clean_media_markers(text: str) -> tuple[Dict[str, List[str]], s
     """
     # 匹配不同类型的媒体标记
     patterns = {
-        "images": r'\n\[SHOW_IMAGE:([^\]]+)\]',
-        "audios": r'\n\[SHOW_AUDIO:([^\]]+)\]',
-        "videos": r'\n\[SHOW_VIDEO:([^\]]+)\]'
+        "images": r'\n\s*\[SHOW_IMAGE:([^\]]+)\]',
+        "audios": r'\n\s*\[SHOW_AUDIO:([^\]]+)\]',
+        "videos": r'\n\s*\[SHOW_VIDEO:([^\]]+)\]'
     }
     
     media_files = {"images": [], "audios": [], "videos": []}
