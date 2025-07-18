@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     # 服务基础配置
     app_name: str = "Pixelle Base Service"
     app_version: str = "0.1.0"
-    host: str = "localhost"
+    host: str = "0.0.0.0"
     port: int = 9001
     debug: bool = False
     
