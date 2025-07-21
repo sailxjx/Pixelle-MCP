@@ -109,7 +109,7 @@ def load_custom_starter(starter_file: Path) -> Optional[StarterModel]:
         
         return StarterModel(
             label=expected_label,
-            icon=data.get("icon", "/public/text.svg"),
+            icon=data.get("icon", "/public/tool.svg"),
             image=data.get("image", None),
             messages=data.get("messages", []),
             enabled=enabled,
