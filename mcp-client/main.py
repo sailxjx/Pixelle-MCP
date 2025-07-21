@@ -24,8 +24,6 @@ async def chat_profile(user: cl.User | None) -> list[cl.ChatProfile]:
         cl.ChatProfile(
             name=model.name,
             markdown_description=f"Use **{model.name}** to talk with you.",
-            # icon="https://picsum.photos/200",
-            icon=model.icon,
             default=default_model_name == model.name,
         )
         for model in models

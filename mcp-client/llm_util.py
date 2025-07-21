@@ -47,7 +47,6 @@ class ModelType(Enum):
 class ModelInfo(BaseModel):
     type: ModelType = Field(description="The type of the model")
     name: str = Field(description="The model name")
-    icon: str = Field(description="The icon of the model")
     base_url: str = Field(description="The base URL of the model")
     api_key: str = Field(description="The API key of the model")
     
@@ -57,7 +56,6 @@ def get_openai_models() -> list[ModelInfo]:
         ModelInfo(
             type=ModelType.OPENAI,
             name=model,
-            icon="public/openai-fill.svg",
             base_url=OPENAI_BASE_URL,
             api_key=OPENAI_API_KEY
         )
@@ -69,7 +67,6 @@ def get_ollama_models() -> list[ModelInfo]:
         ModelInfo(
             type=ModelType.OLLAMA,
             name=model,
-            icon="public/ollama.svg",
             base_url=OLLAMA_BASE_URL,
             api_key=OLLAMA_API_KEY
         )
