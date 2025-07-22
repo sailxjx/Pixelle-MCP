@@ -108,7 +108,7 @@ login_page_image = "/public/login_background.png"
 # This can be used to customize the frontend code.
 # Be careful: If this is a relative path, it should not start with a slash.
 # Fix issue: https://github.com/Chainlit/chainlit/issues/1886
-custom_build = "/public/build"
+custom_build = "public/build/dist"
 
 # Specify optional one or more custom links in the header.
 # [[UI.header_links]]
