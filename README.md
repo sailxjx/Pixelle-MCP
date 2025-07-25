@@ -22,12 +22,13 @@ https://github.com/user-attachments/assets/281812a8-f630-40ef-8eea-95efee05a985
 - [x] 🏗️ **New Architecture**: Three-layer design (mcp-base + mcp-server + mcp-client), clear responsibilities, strong scalability
 - [x] 📦 **Zero Dependency Mode**: Supports local file storage, no external dependencies, one-click startup
 - [x] 🔄 **Flexible Deployment**: Supports multiple storage backends (local/MinIO), choose deployment as needed
+- [x] ⚙️ **Unified Configuration**: Uses YAML configuration scheme, one config file manages all services
 - [x] 🌐 **China-friendly**: Solves Docker network issues, lowers deployment barriers
 
 
 ## 🏃‍♂️ Quick Start
 
-### 📥 1. Clone the Source Code & Configure
+### 📥 1. Clone the Source Code & Configure Services
 
 #### 📦 1.1 Clone the Source Code
 
@@ -36,28 +37,14 @@ git clone https://github.com/AIDC-AI/Pixelle-MCP.git
 cd Pixelle-MCP
 ```
 
-#### 🔧 1.2 Configure Basic Service
+#### ⚙️ 1.2 Configure Services
+
+The project uses a unified YAML configuration scheme:
 
 ```shell
-cd mcp-base
-cp .env.example .env
-# Edit .env as needed
-```
-
-#### 🗄️ 1.3 Configure Server
-
-```shell
-cd mcp-server
-cp .env.example .env
-# Edit .env as needed
-```
-
-#### 🌐 1.4 Configure Client
-
-```shell
-cd mcp-client
-cp .env.example .env
-# Edit .env as needed
+# Copy the configuration example file
+cp config.yml.example config.yml
+# Edit configuration items as needed
 ```
 
 ### 🔧 2. Add MCP Tool (Optional)
@@ -74,7 +61,20 @@ cp -r mcp-server/workflows mcp-server/data/custom_workflows
 
 ### 🚀 3. Start the Services
 
-#### 🛠️ 3.1 Start from Source
+#### 🎯 3.1 Start with Docker (Recommended)
+
+```shell
+# Start all services
+docker compose up -d
+
+# Check service status
+docker compose ps
+
+# View service logs
+docker compose logs -f
+```
+
+#### 🛠️ 3.2 Start from Source
 
 Requires [uv](https://github.com/astral-sh/uv) environment.
 
@@ -103,19 +103,6 @@ cd mcp-client
 uv sync
 # Start service (for hot-reload in dev mode: uv run chainlit run main.py -w)
 uv run main.py
-```
-
-#### 🎯 3.2 Start with Docker (Recommended)
-
-```shell
-# Start all services
-docker compose up -d
-
-# Check service status
-docker compose ps
-
-# View service logs
-docker compose logs -f
 ```
 
 

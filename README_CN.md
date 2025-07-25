@@ -22,13 +22,14 @@ https://github.com/user-attachments/assets/825a3161-cb3f-443c-a3fd-d7fada098a90
 - [x] 🏗️ **新架构**: 三层架构设计（mcp-base + mcp-server + mcp-client），职责清晰，扩展性强
 - [x] 📦 **零依赖模式**: 支持本地文件存储，无需外部依赖，一键启动
 - [x] 🔄 **灵活部署**: 支持多种存储后端（本地/MinIO），可根据需求选择部署方式
+- [x] ⚙️ **统一配置**: 采用 YAML 配置方案，一个配置文件管理所有服务
 - [x] 🌐 **国内友好**: 解决Docker网络问题，降低部署门槛
 
 
 
 ## 🏃‍♂️ 快速开始
 
-### 📥 1. 克隆源码 & 更改配置
+### 📥 1. 克隆源码 & 配置服务
 
 #### 📦 1.1 克隆源码
 
@@ -37,28 +38,14 @@ git clone https://github.com/AIDC-AI/Pixelle-MCP.git
 cd Pixelle-MCP
 ```
 
-#### 🔧 1.2 更改基础服务配置
+#### ⚙️ 1.2 配置服务
+
+项目采用统一的 YAML 配置方案：
 
 ```shell
-cd mcp-base
-cp .env.example .env
-# 按需更改.env的配置
-```
-
-#### 🗄️ 1.3 更改服务端配置
-
-```shell
-cd mcp-server
-cp .env.example .env
-# 按需更改.env的配置
-```
-
-#### 🌐 1.4 更改客户端配置
-
-```shell
-cd mcp-client
-cp .env.example .env
-# 按需更改.env的配置
+# 复制配置示例文件
+cp config.yml.example config.yml
+# 根据需要修改配置项
 ```
 
 ### 🔧 2. 添加MCP Tool（可选）
@@ -75,7 +62,20 @@ cp -r mcp-server/workflows mcp-server/data/custom_workflows
 
 ### 🚀 3. 启动服务
 
-#### 🛠️ 3.1 源码方式启动
+#### 🎯 3.1 Docker方式启动（推荐）
+
+```shell
+# 启动所有服务
+docker compose up -d
+
+# 查看服务状态
+docker compose ps
+
+# 查看服务日志
+docker compose logs -f
+```
+
+#### 🛠️ 3.2 源码方式启动
 
 需要先安装 [uv](https://github.com/astral-sh/uv) 环境。
 
@@ -104,19 +104,6 @@ cd mcp-client
 uv sync
 # 启动服务（开发模式需要热更新时，运行：uv run chainlit run main.py -w）
 uv run main.py
-```
-
-#### 🎯 3.2 Docker方式启动（推荐）
-
-```shell
-# 启动所有服务
-docker compose up -d
-
-# 查看服务状态
-docker compose ps
-
-# 查看服务日志
-docker compose logs -f
 ```
 
 
