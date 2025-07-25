@@ -1,302 +1,299 @@
 <h1 align="center">🎨 Pixelle MCP</h1>
 
-<p align="center">✨ 基于 MCP 协议的 AIGC 方案，0代码将 ComfyUI 工作流无缝转化为 Agent 工具，让 LLM 与 ComfyUI 强强联合。</p>
+<p align="center">✨ An AIGC solution based on the MCP protocol, seamlessly converting ComfyUI workflows into Agent tools with zero code, empowering LLM and ComfyUI integration.</p>
 
-<p align="center"><b>中文</b> | <a href="README_EN.md">English</a></p>
+<p align="center"><a href="README.md">中文</a> | <b>English</b></p>
 
-https://github.com/user-attachments/assets/825a3161-cb3f-443c-a3fd-d7fada098a90
+https://github.com/user-attachments/assets/281812a8-f630-40ef-8eea-95efee05a985
 
-## 📁 项目结构
+## 📁 Project Structure
 
-- **mcp-base**: 🔧 基础服务，提供文件存储和共用服务能力
-- **mcp-client**: 🌐 MCP 客户端，基于 Chainlit 构建的 Web 界面
-- **mcp-server**: 🗄️ MCP 服务端，提供各种 AIGC 工具和服务
+- **mcp-base**: 🔧 Basic service, provides file storage and shared service capabilities
+- **mcp-client**: 🌐 MCP client, a web interface built on Chainlit
+- **mcp-server**: 🗄️ MCP server, provides various AIGC tools and services
 
-## 🚀 功能特性
+## 🚀 Features
 
-- [x] 🔄 支持TISV（Text、Image、Sound/Speech、Video）全模态的互转和生成
-- [x] 🧩 底层基于[ComfyUI](https://github.com/comfyanonymous/ComfyUI)实现，继承ComfyUI的开放生态下的所有能力
-- [x] 🔧 制定并实现了 Workflow 即 MCP Tool 的方案，0代码开发，即可动态添加新的 MCP Tool
-- [x] 🔌 server端基于[MCP](https://modelcontextprotocol.io/introduction)协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
-- [x] 💻 client端基于[Chaintlit](https://github.com/Chainlit/chainlit)框架开发，继承了Chainlit的UI交互控件，支持集成更多的MCP Server
-- [x] 🏗️ **新架构**: 三层架构设计（mcp-base + mcp-server + mcp-client），职责清晰，扩展性强
-- [x] 📦 **零依赖模式**: 支持本地文件存储，无需外部依赖，一键启动
-- [x] 🔄 **灵活部署**: 支持多种存储后端（本地/MinIO），可根据需求选择部署方式
-- [x] 🌐 **国内友好**: 解决Docker网络问题，降低部署门槛
+- [x] 🔄 Supports full-modal TISV (Text, Image, Sound/Speech, Video) conversion and generation
+- [x] 🧩 Built on [ComfyUI](https://github.com/comfyanonymous/ComfyUI), inheriting all capabilities from the open ComfyUI ecosystem
+- [x] 🔧 Defines and implements the Workflow-as-MCP Tool solution, enabling zero-code development and dynamic addition of new MCP Tools
+- [x] 🔌 Server provides functionality based on the [MCP](https://modelcontextprotocol.io/introduction) protocol, supporting integration with any MCP client (including but not limited to Cursor, Claude Desktop, etc.)
+- [x] 💻 Client is developed based on the [Chainlit](https://github.com/Chainlit/chainlit) framework, inheriting Chainlit's UI controls and supporting integration with more MCP Servers
+- [x] 🏗️ **New Architecture**: Three-layer design (mcp-base + mcp-server + mcp-client), clear responsibilities, strong scalability
+- [x] 📦 **Zero Dependency Mode**: Supports local file storage, no external dependencies, one-click startup
+- [x] 🔄 **Flexible Deployment**: Supports multiple storage backends (local/MinIO), choose deployment as needed
+- [x] 🌐 **China-friendly**: Solves Docker network issues, lowers deployment barriers
 
 
+## 🏃‍♂️ Quick Start
 
-## 🏃‍♂️ 快速开始
+### 📥 1. Clone the Source Code & Configure
 
-### 📥 1. 克隆源码 & 更改配置
-
-#### 📦 1.1 克隆源码
+#### 📦 1.1 Clone the Source Code
 
 ```shell
 git clone https://github.com/AIDC-AI/Pixelle-MCP.git
 cd Pixelle-MCP
 ```
 
-#### 🔧 1.2 更改基础服务配置
+#### 🔧 1.2 Configure Basic Service
 
 ```shell
 cd mcp-base
 cp .env.example .env
-# 按需更改.env的配置
+# Edit .env as needed
 ```
 
-#### 🗄️ 1.3 更改服务端配置
+#### 🗄️ 1.3 Configure Server
 
 ```shell
 cd mcp-server
 cp .env.example .env
-# 按需更改.env的配置
+# Edit .env as needed
 ```
 
-#### 🌐 1.4 更改客户端配置
+#### 🌐 1.4 Configure Client
 
 ```shell
 cd mcp-client
 cp .env.example .env
-# 按需更改.env的配置
+# Edit .env as needed
 ```
 
-### 🔧 2. 添加MCP Tool（可选）
+### 🔧 2. Add MCP Tool (Optional)
 
-这一步是可选的，只会决定你Agent的能力，不影响正常对话，如果你暂时不需要，可以先跳过。
+This step is optional and only affects your Agent's capabilities. You can skip it if not needed for now.
 
-`mcp-server/workflows`中是我们默认提供的一套目前比较热门的工作流，运行如下命令可以将其拷贝到你的mcp-server中，服务启动时会自动将其转化为MCP Tool，供大模型调用。
+The `mcp-server/workflows` directory contains a set of popular workflows by default. Run the following command to copy them to your mcp-server. When the service starts, they will be automatically converted into MCP Tools for LLM use.
 
-**注：这里强烈建议在拷贝之前，先将工作流拖进你的ComfyUI画布试运行，以确保后续调用过程中能够顺利执行。**
+**Note: It is strongly recommended to test the workflow in your ComfyUI canvas before copying, to ensure smooth execution later.**
 
 ```shell
 cp -r mcp-server/workflows mcp-server/data/custom_workflows
 ```
 
-### 🚀 3. 启动服务
+### 🚀 3. Start the Services
 
-#### 🛠️ 3.1 源码方式启动
+#### 🛠️ 3.1 Start from Source
 
-需要先安装 [uv](https://github.com/astral-sh/uv) 环境。
+Requires [uv](https://github.com/astral-sh/uv) environment.
 
-**启动基础服务（mcp-base）**：
+**Start Basic Service (mcp-base):**
 ```shell
 cd mcp-base
-# 安装依赖（仅首次或更新时需要）
+# Install dependencies (only needed on first run or after updates)
 uv sync
-# 启动服务
+# Start service
 uv run main.py
 ```
 
-**启动服务端（mcp-server）**：
+**Start Server (mcp-server):**
 ```shell
 cd mcp-server
-# 安装依赖（仅首次或更新时需要）
+# Install dependencies (only needed on first run or after updates)
 uv sync
-# 启动服务
+# Start service
 uv run main.py
 ```
 
-**启动客户端（mcp-client）**：
+**Start Client (mcp-client):**
 ```shell
 cd mcp-client
-# 安装依赖（仅首次或更新时需要）
+# Install dependencies (only needed on first run or after updates)
 uv sync
-# 启动服务（开发模式需要热更新时，运行：uv run chainlit run main.py -w）
+# Start service (for hot-reload in dev mode: uv run chainlit run main.py -w)
 uv run main.py
 ```
 
-#### 🎯 3.2 Docker方式启动（推荐）
+#### 🎯 3.2 Start with Docker (Recommended)
 
 ```shell
-# 启动所有服务
+# Start all services
 docker compose up -d
 
-# 查看服务状态
+# Check service status
 docker compose ps
 
-# 查看服务日志
+# View service logs
 docker compose logs -f
 ```
 
 
-### 🌐 4. 访问服务
+### 🌐 4. Access the Services
 
-启动完成后，各服务地址如下：
+After startup, the service addresses are as follows:
 
-- **客户端**: 🌐 http://localhost:9003 (Chainlit Web UI)
-- **服务端**: 🗄️ http://localhost:9002 (MCP Server)
-- **基础服务**: 🔧 http://localhost:9001 (文件存储和基础API)
+- **Client**: 🌐 http://localhost:9003 (Chainlit Web UI)
+- **Server**: 🗄️ http://localhost:9002 (MCP Server)
+- **Base Service**: 🔧 http://localhost:9001 (File storage and basic API)
 
-## 🛠️ 添加自己的MCP Tool
+## 🛠️ Add Your Own MCP Tool
 
-⚡ 一个工作流即为提个MCP Tool
+⚡ One workflow = One MCP Tool
 
-### 🎯 1. 添加最简单的MCP Tool
+### 🎯 1. Add the Simplest MCP Tool
 
-* 📝 在ComfyUI中搭建一个实现图片高斯模糊的工作流（[点击获取](docs/i_blur_ui.json)），然后将 `LoadImage `节点的 title 改为 `$image.image!`，如下图
+* 📝 Build a workflow in ComfyUI for image Gaussian blur ([Get it here](docs/i_blur_ui.json)), then set the `LoadImage` node's title to `$image.image!` as shown below:
 ![](docs/easy-workflow.png)
 
-* 📤 然后将其导出为api格式文件，并重命名为 `i_blur.json`，你可以自己导出，也可以直接使用我们为你导出好的（[点击获取](docs/i_blur.json)）
+* 📤 Export it as an API format file and rename it to `i_blur.json`. You can export it yourself or use our pre-exported version ([Get it here](docs/i_blur.json))
 
-* 📋 复制导出的API格式工作流文件（注：务必是API格式的），在web页面输入，并LLM添加这个Tool
+* 📋 Copy the exported API workflow file (must be API format), input it on the web page, and let the LLM add this Tool
 
   ![](docs/ready_to_send.png)
 
-* ✨ 消息发送后，LLM会让将这个工作流自动转化为一个MCP Tool
+* ✨ After sending, the LLM will automatically convert this workflow into an MCP Tool
 
   ![](docs/added_mcp.png)
 
-* 🎨 此时，刷新页面，再发送任意图片，即可实现基于LLM进行的高斯模糊处理
+* 🎨 Now, refresh the page and send any image to perform Gaussian blur processing via LLM
 
   ![](docs/use_mcp_tool.png)
 
-### 🔌 2. 添加复杂的MCP Tool
+### 🔌 2. Add a Complex MCP Tool
 
-📊 添加MCP Tool的步骤和前面一样，唯一不一样的就是工作流部分（点击下载工作流：[UI格式](docs/t2i_by_flux_turbo_ui.json) 和 [API格式](docs/t2i_by_flux_turbo.json)）
+The steps are the same as above, only the workflow part differs ([Download workflow: UI format](docs/t2i_by_flux_turbo_ui.json) and [API format](docs/t2i_by_flux_turbo.json))
 
 ![](docs/t2i_by_flux_turbo.png)
 
 
-## 🔧 ComfyUI Workflow 自定义规范
+## 🔧 ComfyUI Workflow Custom Specification
 
-### 🎨 工作流格式
-系统支持 ComfyUI 的工作流，只需要在画布中设计好工作流，然后导出为 API 格式即可。通过在节点标题中使用特殊语法来定义参数和输出。
+### 🎨 Workflow Format
+The system supports ComfyUI workflows. Just design your workflow in the canvas and export it as API format. Use special syntax in node titles to define parameters and outputs.
 
-### 📝 参数定义规范
+### 📝 Parameter Definition Specification
 
-在 ComfyUI 画布中，双击节点标题进行编辑，使用以下 DSL 语法定义参数：
+In the ComfyUI canvas, double-click the node title to edit, and use the following DSL syntax to define parameters:
 
 ```
-$<参数名>.<字段名>[!][:<描述信息>]
+$<param_name>.<field_name>[!][:<description>]
 ```
 
-#### 🔍 语法说明：
-- `参数名`：生成的MCP工具函数的参数名
-- `字段名`：节点中对应的输入字段名
-- `!`：表示该参数为必需参数
-- `描述信息`：参数的描述
+#### 🔍 Syntax Explanation:
+- `param_name`: The parameter name for the generated MCP tool function
+- `field_name`: The corresponding input field in the node
+- `!`: Indicates this parameter is required
+- `description`: Description of the parameter
 
-#### 💡 操作示例：
+#### 💡 Example:
 
-**必需参数示例：**
+**Required parameter example:**
 
-- LoadImage 节点标题设为：`$image.image!:输入图片URL`
-- 含义：创建名为 `image` 的必需参数，对应节点的 `image` 字段
+- Set LoadImage node title to: `$image.image!:Input image URL`
+- Meaning: Creates a required parameter named `image`, mapped to the node's `image` field
 
-**可选参数示例：**
+**Optional parameter example:**
 
-- `EmptyLatentImage` 节点 title 设为：`$width.width:图片宽度，默认512`
-- 含义：创建名为 `width` 的可选参数，对应节点的 `width` 字段，默认值为节点中设置的 512
+- Set EmptyLatentImage node title to: `$width.width:Image width, default 512`
+- Meaning: Creates an optional parameter named `width`, mapped to the node's `width` field, default value is 512
 
-### 🎯 类型推断规则
+### 🎯 Type Inference Rules
 
-系统会根据节点字段的当前值自动推断参数类型：
-- 🔢 `int` 类型：整数值（如 512, 1024）
-- 📊 `float` 类型：浮点数值（如 1.5, 3.14）
-- ✅ `bool` 类型：布尔值（如 true, false）
-- 📝 `str` 类型：字符串值（默认类型）
+The system automatically infers parameter types based on the current value of the node field:
+- 🔢 `int`: Integer values (e.g. 512, 1024)
+- 📊 `float`: Floating-point values (e.g. 1.5, 3.14)
+- ✅ `bool`: Boolean values (e.g. true, false)
+- 📝 `str`: String values (default type)
 
-### 📤 输出定义规范
+### 📤 Output Definition Specification
 
-#### 🤖 方式1：自动识别输出节点
-系统会自动识别以下常见的输出节点：
-- 🖼️ `SaveImage` - 图片保存节点
-- 🎬 `SaveVideo` - 视频保存节点
-- 🔊 `SaveAudio` - 音频保存节点
-- 📹 `VHS_SaveVideo` - VHS视频保存节点
-- 🎵 `VHS_SaveAudio` - VHS音频保存节点
+#### 🤖 Method 1: Auto-detect Output Nodes
+The system will automatically detect the following common output nodes:
+- 🖼️ `SaveImage` - Image save node
+- 🎬 `SaveVideo` - Video save node
+- 🔊 `SaveAudio` - Audio save node
+- 📹 `VHS_SaveVideo` - VHS video save node
+- 🎵 `VHS_SaveAudio` - VHS audio save node
 
-#### 🎯 方式2：手动标记输出
-> 一般用在包含多个输出的场景
-在任意节点的标题中使用 `$output.变量名` 来标记输出：
-- 节点标题设为：`$output.result`
-- 系统会将此节点的输出作为工具的返回值
-
-
-
-### 📄 工具描述配置（可选）
-
-可以在工作流中添加一个标题为 `MCP` 的节点来提供工具描述：
-
-1. 添加一个 `String (Multiline)` 或类似的文本节点 (需符合：单字符串属性，且节点字段为以下任意一个：value, text, string)
-2. 将节点标题设为：`MCP`
-3. 在节点的值字段中输入工具的详细描述
-
-### 🎨 完整操作示例
-
-以图片模糊处理工具为例：
-
-1. **📥 添加LoadImage节点**
-   - 设置默认图片
-   - 修改标题为：`$image.image!:需要处理的图片URL`
-
-2. **🌀 添加ImageBlur节点**
-   - 连接LoadImage的输出
-   - 设置模糊半径为 15
-   - 修改标题为：`$blur_radius.blur_radius:模糊半径，值越大越模糊`
-
-3. **💾 添加SaveImage节点**
-   - 连接ImageBlur的输出
-   - 标题保持 `Save Image`（系统自动识别）
-
-4. **📝 添加描述节点（可选）**
-   - 添加 `String (Multiline)` 节点
-   - 标题设为：`MCP`
-   - 值设为：`图片模糊处理工具，可以对输入图片进行高斯模糊处理`
-
-### ⚠️ 重要注意事项
-
-1. **🔒 参数验证**：标记为可选的参数（没有!符号）必须在节点中设置默认值
-2. **🔗 节点连接**：已连接到其他节点的字段不会被解析为参数
-3. **🏷️ 工具命名**：导出的文件名将作为工具名称，建议使用有意义的英文名称
-4. **📋 描述详细**：尽量在参数描述中提供详细说明，提升用户体验
-5. **🎯 导出格式**：必须导出为 API 格式，不要导出 UI 格式
+#### 🎯 Method 2: Manual Output Marking
+> Usually used for multiple outputs
+Use `$output.var_name` in any node title to mark output:
+- Set node title to: `$output.result`
+- The system will use this node's output as the tool's return value
 
 
+### 📄 Tool Description Configuration (Optional)
 
-## 🤝 如何参与共建
+You can add a node titled `MCP` in the workflow to provide a tool description:
 
-我们欢迎所有形式的贡献！无论您是开发者、设计师还是用户，都可以通过以下方式参与项目建设：
+1. Add a `String (Multiline)` or similar text node (must have a single string property, and the node field should be one of: value, text, string)
+2. Set the node title to: `MCP`
+3. Enter a detailed tool description in the value field
 
-### 🐛 报告问题
-* 📋 在 [Issues](https://github.com/AIDC-AI/Pixelle-MCP/issues) 页面提交 Bug 报告
-* 🔍 提交前请先搜索是否已有相似问题
-* 📝 请详细描述问题的复现步骤和环境信息
+### 🎨 Complete Example
 
-### 💡 功能建议
-* 🚀 在 [Issues](https://github.com/AIDC-AI/Pixelle-MCP/issues) 中提交功能请求
-* 💭 描述您希望添加的功能及其使用场景
-* 🎯 解释该功能如何改善用户体验
+Take the image blur tool as an example:
 
-### 🔧 代码贡献
+1. **📥 Add LoadImage node**
+   - Set a default image
+   - Change title to: `$image.image!:Image URL to process`
 
-#### 📋 贡献流程
-1. 🍴 Fork 本仓库到您的 GitHub 账户
-2. 🌿 创建功能分支：`git checkout -b feature/your-feature-name`
-3. 💻 进行开发并添加相应的测试
-4. 📝 提交更改：`git commit -m "feat: add your feature"`
-5. 📤 推送到您的仓库：`git push origin feature/your-feature-name`
-6. 🔄 创建 Pull Request 到主仓库
+2. **🌀 Add ImageBlur node**
+   - Connect LoadImage output
+   - Set blur radius to 15
+   - Change title to: `$blur_radius.blur_radius:Blur radius, higher value = more blur`
 
-#### 🎨 代码规范
-* 🐍 Python 代码遵循 [PEP 8](https://pep8.org/) 规范
-* 📖 为新功能添加适当的文档和注释
+3. **💾 Add SaveImage node**
+   - Connect ImageBlur output
+   - Keep title as `Save Image` (auto-detected)
 
-### 🧩 贡献工作流
-* 📦 分享您的 ComfyUI 工作流到社区
-* 🛠️ 提交经过测试的工作流文件
-* 📚 为工作流添加使用说明和示例
+4. **📝 Add description node (optional)**
+   - Add a `String (Multiline)` node
+   - Set title to: `MCP`
+   - Set value to: `Image blur tool, applies Gaussian blur to input image`
 
-### 💬 社区交流
-* 🎯 参与 [Discussions](https://github.com/AIDC-AI/Pixelle-MCP/discussions) 讨论
-* 💡 分享使用经验和最佳实践
-* 🤝 帮助其他用户解决问题
+### ⚠️ Important Notes
+
+1. **🔒 Parameter Validation**: Optional parameters (without !) must have default values set in the node
+2. **🔗 Node Connections**: Fields already connected to other nodes will not be parsed as parameters
+3. **🏷️ Tool Naming**: Exported file name will be used as the tool name, use meaningful English names
+4. **📋 Detailed Descriptions**: Provide detailed parameter descriptions for better user experience
+5. **🎯 Export Format**: Must export as API format, do not export as UI format
 
 
-## 🙏 致谢
+## 🤝 How to Contribute
 
-❤️ 衷心感谢以下所有组织、项目和团队，为本项目的发展和落地提供了支持。
+We welcome all forms of contribution! Whether you're a developer, designer, or user, you can participate in the project in the following ways:
+
+### 🐛 Report Issues
+* 📋 Submit bug reports on the [Issues](https://github.com/AIDC-AI/Pixelle-MCP/issues) page
+* 🔍 Please search for similar issues before submitting
+* 📝 Describe the reproduction steps and environment in detail
+
+### 💡 Feature Suggestions
+* 🚀 Submit feature requests in [Issues](https://github.com/AIDC-AI/Pixelle-MCP/issues)
+* 💭 Describe the feature you want and its use case
+* 🎯 Explain how it improves user experience
+
+### 🔧 Code Contributions
+
+#### 📋 Contribution Process
+1. 🍴 Fork this repo to your GitHub account
+2. 🌿 Create a feature branch: `git checkout -b feature/your-feature-name`
+3. 💻 Develop and add corresponding tests
+4. 📝 Commit changes: `git commit -m "feat: add your feature"`
+5. 📤 Push to your repo: `git push origin feature/your-feature-name`
+6. 🔄 Create a Pull Request to the main repo
+
+#### 🎨 Code Style
+* 🐍 Python code follows [PEP 8](https://pep8.org/) style guide
+* 📖 Add appropriate documentation and comments for new features
+
+### 🧩 Contribute Workflows
+* 📦 Share your ComfyUI workflows with the community
+* 🛠️ Submit tested workflow files
+* 📚 Add usage instructions and examples for workflows
+
+### 💬 Community
+* 🎯 Join [Discussions](https://github.com/AIDC-AI/Pixelle-MCP/discussions)
+* 💡 Share experiences and best practices
+* 🤝 Help other users solve problems
+
+
+## 🙏 Acknowledgements
+
+❤️ Sincere thanks to the following organizations, projects, and teams for supporting the development and implementation of this project.
 
 * 🧩 [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 * 💬 [Chainlit](https://github.com/Chainlit/chainlit)
@@ -306,4 +303,4 @@ $<参数名>.<字段名>[!][:<描述信息>]
 * ⚡ [Flux](https://github.com/black-forest-labs/flux)
 
 ## License
-本项目基于MIT许可证（[LICENSE](License), SPDX-License-identifier: MIT）发布。
+This project is released under the MIT License ([LICENSE](License), SPDX-License-identifier: MIT).
