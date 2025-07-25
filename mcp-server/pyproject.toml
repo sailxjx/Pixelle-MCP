@@ -6,7 +6,6 @@ requires-python = ">=3.11"
 dependencies = [
     "aiohttp>=3.9.0",
     "boto3>=1.38.34",
-    "chardet>=5.2.0",
     "fastmcp>=2.7.1",
     "pillow>=11.2.1",
     "python-dotenv>=1.1.0",
