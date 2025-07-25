@@ -4,7 +4,9 @@
 
 <p align="center"><b>中文</b> | <a href="README_EN.md">English</a></p>
 
-<p align="center"><效果演示 | 待补充></p>
+<p align="center">
+<video src="docs/cg_cn.mp4" control style="border: 1px solid #d4d4d4; border-radius: 6px;" />
+</p>
 
 ## 📁 项目结构
 
