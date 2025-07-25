@@ -1,7 +1,7 @@
 # Copyright (C) 2025 AIDC-AI
 # This project is licensed under the MIT License (SPDX-License-identifier: MIT).
 
-from file_uploader import upload
+from utils.file_uploader import upload
 import chainlit as cl
 
 def messages_from_chaintlit_to_openai(cl_messages: list[cl.Message]) -> list[dict]:

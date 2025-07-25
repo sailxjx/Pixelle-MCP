@@ -6,7 +6,7 @@ import os
 from typing import Union
 
 from pydantic import BaseModel, Field
-from core import logger
+from core.core import logger
 
 # 默认模型
 CHAINLIT_CHAT_DEFAULT_MODEL = os.getenv("CHAINLIT_CHAT_DEFAULT_MODEL")
@@ -16,7 +16,7 @@ logger.info(f"Default chat model: {CHAINLIT_CHAT_DEFAULT_MODEL}")
 # OpenAI配置
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-CHAINLIT_CHAT_OPENAI_MODELS = os.getenv("CHAINLIT_CHAT_OPENAI_MODELS")
+CHAINLIT_CHAT_OPENAI_MODELS = os.getenv("CHAINLIT_CHAT_OPENAI_MODELS", "")
 
 openai_models = [model.strip() for model in CHAINLIT_CHAT_OPENAI_MODELS.split(",") if model.strip()]
 logger.info(f"OPENAI_BASE_URL: {OPENAI_BASE_URL}")

@@ -4,18 +4,18 @@
 import chainlit as cl
 from chainlit.mcp import McpConnection
 from mcp import ClientSession
-import llm_util
-from message_converter import messages_from_chaintlit_to_openai
-import starters
-import auth
+import utils.llm_util as llm_util
+from converters.message_converter import messages_from_chaintlit_to_openai
+import chat.starters as starters
+import auth.auth as auth
 
-from core import logger
-from prompt import DEFAULT_SYSTEM_PROMPT
-from tool_converter import tools_from_chaintlit_to_openai
-from chat_handler import handle_mcp_connect, handle_mcp_disconnect
-from chat_settings import setup_chat_settings, setup_settings_update
-import chat_handler as tool_handler
-from file_uploader import upload
+from core.core import logger
+from core.prompt import DEFAULT_SYSTEM_PROMPT
+from converters.tool_converter import tools_from_chaintlit_to_openai
+from chat.chat_handler import handle_mcp_connect, handle_mcp_disconnect
+from chat.chat_settings import setup_chat_settings, setup_settings_update
+import chat.chat_handler as tool_handler
+from utils.file_uploader import upload
 
 
 @cl.set_chat_profiles

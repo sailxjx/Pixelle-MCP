@@ -13,7 +13,7 @@ from typing import Union, Optional, Tuple
 from urllib.parse import urlparse
 import uuid
 
-from core import logger
+from core.core import logger
 
 
 class McpBaseUploader:
