@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 """
 本地文件存储实现
 将文件存储到本地文件系统

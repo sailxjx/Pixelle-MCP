@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 from enum import Enum
 from typing import Tuple, Literal
 from PIL import Image

@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 """
 存储模块
 提供多种存储后端的统一接口

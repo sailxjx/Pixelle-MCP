@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 import chainlit as cl
 
 @cl.password_auth_callback

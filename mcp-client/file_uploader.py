@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 """
 MCP Base 文件上传器
 调用 mcp-base 的 API 进行文件上传

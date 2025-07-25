@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 """
 Pixelle Base Service
 基于FastAPI的基础服务，提供文件存储和共用服务能力

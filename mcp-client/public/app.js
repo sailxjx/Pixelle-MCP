@@ -1,3 +1,8 @@
+/*
+ Copyright (C) 2025 AIDC-AI
+ This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+*/
+
 // 定义基础服务地址常量
 const MCP_SERVER_BASE_URL = "http://localhost:9002";
 

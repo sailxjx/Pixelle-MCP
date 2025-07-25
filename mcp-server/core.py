@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 from typing import Callable
 from fastmcp import FastMCP
 from dotenv import load_dotenv

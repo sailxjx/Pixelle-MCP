@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 def format_duration(duration_seconds: float) -> str:
     """
     将秒数格式化为人类友好的时间字符串

@@ -1,3 +1,6 @@
+# Copyright (C) 2025 AIDC-AI
+# This project is licensed under the MIT License (SPDX-License-identifier: MIT).
+
 from typing import Awaitable, Optional, Callable, Any, List, Dict, Tuple
 import chainlit as cl
 from pydantic import BaseModel
