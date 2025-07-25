@@ -37,7 +37,7 @@ git clone https://github.com/AIDC-AI/Pixelle-MCP.git
 cd Pixelle-MCP
 ```
 
-#### 🗄️ 1.2 更改基础服务配置
+#### 🔧 1.2 更改基础服务配置
 
 ```shell
 cd mcp-base
@@ -75,20 +75,7 @@ cp -r mcp-server/workflows mcp-server/data/custom_workflows
 
 ### 🚀 3. 启动服务
 
-#### 🎯 3.1 Docker方式启动（推荐）
-
-```shell
-# 启动所有服务
-docker-compose up -d
-
-# 查看服务状态
-docker-compose ps
-
-# 查看服务日志
-docker-compose logs -f
-```
-
-#### 🛠️ 3.2 源码方式启动
+#### 🛠️ 3.1 源码方式启动
 
 需要先安装 [uv](https://github.com/astral-sh/uv) 环境。
 
@@ -115,8 +102,21 @@ uv run main.py
 cd mcp-client
 # 安装依赖（仅首次或更新时需要）
 uv sync
-# 启动服务
+# 启动服务（开发模式需要热更新时，运行：uv run chainlit run main.py -w）
 uv run main.py
+```
+
+#### 🎯 3.2 Docker方式启动（推荐）
+
+```shell
+# 启动所有服务
+docker compose up -d
+
+# 查看服务状态
+docker compose ps
+
+# 查看服务日志
+docker compose logs -f
 ```
 
 
