@@ -290,4 +290,4 @@ We welcome all forms of contribution! Whether you're a developer, designer, or u
 * ⚡ [Flux](https://github.com/black-forest-labs/flux)
 
 ## License
-This project is released under the MIT License ([LICENSE](License), SPDX-License-identifier: MIT).
+This project is released under the MIT License ([LICENSE](LICENSE), SPDX-License-identifier: MIT).
