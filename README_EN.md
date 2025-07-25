@@ -5,7 +5,7 @@
 <p align="center"><a href="README.md">中文</a> | <b>English</b></p>
 
 <p align="center">
-<video src="docs/cg_en.mp4" control style="border: 1px solid #d4d4d4; border-radius: 6px;" />
+
 </p>
 
 ## 📁 Project Structure
