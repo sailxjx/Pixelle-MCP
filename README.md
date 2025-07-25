@@ -306,4 +306,4 @@ $<参数名>.<字段名>[!][:<描述信息>]
 * ⚡ [Flux](https://github.com/black-forest-labs/flux)
 
 ## License
-本项目基于MIT许可证（[](License), SPDX-License-identifier: MIT）发布。
+本项目基于MIT许可证（[LICENSE](License), SPDX-License-identifier: MIT）发布。
