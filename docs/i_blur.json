@@ -10,7 +10,7 @@
   },
   "4": {
     "inputs": {
-      "blur_radius": 15,
+      "blur_radius": 30,
       "sigma": 1,
       "image": [
         "1",
