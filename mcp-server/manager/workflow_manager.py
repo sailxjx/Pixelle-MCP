@@ -102,11 +102,15 @@ class WorkflowManager:
     def _save_workflow_if_needed(self, workflow_path: Path, title: str):
         """如果需要，保存工作流文件到工作流目录"""
         target_workflow_path = self.workflows_dir / f"{title}.json"
-        
         try:
             # 确保工作流目录存在
             self.workflows_dir.mkdir(parents=True, exist_ok=True)
-            
+
+            # 如果源文件和目标文件是同一个文件，直接跳过
+            if os.path.abspath(str(workflow_path)) == os.path.abspath(str(target_workflow_path)):
+                logger.info(f"工作流文件已存在且路径相同，无需复制: {target_workflow_path}")
+                return
+
             # 复制工作流文件到工作流目录
             import shutil
             shutil.copy2(workflow_path, target_workflow_path)
