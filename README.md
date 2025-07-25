@@ -306,3 +306,6 @@ $<参数名>.<字段名>[!][:<描述信息>]
 * 🔌 [MCP](https://modelcontextprotocol.io/introduction)
 * 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
 * ⚡ [Flux](https://github.com/black-forest-labs/flux)
+
+## License
+本项目基于MIT许可证（[](License), SPDX-License-identifier: MIT）发布。

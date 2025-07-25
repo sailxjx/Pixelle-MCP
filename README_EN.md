@@ -277,3 +277,6 @@ Thank you for your attention and support for the Pixelle MCP project! 🙏
 * 🔌 [MCP](https://modelcontextprotocol.io/introduction)
 * 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
 * ⚡ [Flux](https://github.com/black-forest-labs/flux) 
+
+## License
+The project is released under the MIT License ([](LICENSE), SPDX-License-identifier: MIT).
