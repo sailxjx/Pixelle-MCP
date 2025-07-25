@@ -1,0 +1,65 @@
+# Pixelle MCP 项目配置文件示例
+# 
+# 配置加载逻辑：
+# 1. 各服务启动时，优先加载本服务目录下的 config.yml（如 mcp-base/config.yml）
+# 2. 如果本地配置不存在，则兜底加载项目根目录下的 config.yml
+# 3. 两者不会同时加载，只加载找到的第一个配置文件
+# 4. 加载后会自动将对应服务区块的配置注入到环境变量中（变量名大写）
+# 
+# 使用建议：
+# - 全局部署：将此文件复制为根目录 config.yml，所有服务共用一个配置文件
+# - 分离部署：将对应区块复制到各服务目录下的 config.yml，独立配置
+# - 混合部署：可以根据需要灵活组合全局配置和局部配置
+
+# 基础服务配置
+base:
+  # 时区设置
+  tz: Asia/Shanghai
+  
+  # 服务配置
+  server_host: localhost
+  server_port: 9001
+  # 可选, 用于指定公开访问URL, 一般本地服务不需要配置, 服务不在本机时需要配置为局域网IP或域名
+  public_read_url: ""
+
+
+# MCP 服务端配置
+server:
+  # 时区设置
+  tz: Asia/Shanghai
+  
+  # MCP Server 配置
+  mcp_host: localhost
+  mcp_port: 9002
+  
+  # ComfyUI 集成配置
+  # ComfyUI 服务地址
+  comfyui_base_url: http://localhost:8188
+  # ComfyUI API Key (如果工作流中用到了API Nodes, 则需要配置该项, 从这里获取: https://platform.comfy.org/profile/api-keys)
+  comfyui_api_key: ""
+
+
+# MCP 客户端配置
+client:
+  # 时区设置
+  tz: Asia/Shanghai
+  
+  # MCP Client Web服务配置
+  # Chainlit 框架配置 (用来做chainlit的auth，可以复用，也可以再随机生成)
+  chainlit_auth_secret: "8Z$9@,BzJv*sxlyfj9JVWDIltov5kx%Buc*kA>O>.oLDsEwGuD.Zm~2y3vBk,m_A"
+  chainlit_host: 127.0.0.1
+  chainlit_port: 9003
+  chainlit_auth_enabled: true
+  
+  # LLM 模型配置 (OpenAI和Ollama至少要配置一个, 要配置的模型需要支持tool调用)
+  # OpenAI 配置
+  openai_base_url: https://api.openai.com/v1
+  openai_api_key: ""
+  # 列出要用到的 OpenAI 模型，如果多个，请以英文逗号分隔
+  chainlit_chat_openai_models: "gpt-4.1"
+  # Ollama 配置（本地模型）
+  ollama_base_url: http://localhost:11434/v1
+  # 列出要用到的 Ollama 模型，如果多个，请以英文逗号分隔
+  ollama_models: ""
+  # 可选，对话的默认模型 (需要在上方的 chainlit_chat_openai_models 或 ollama_models 中)
+  chainlit_chat_default_model: "" 

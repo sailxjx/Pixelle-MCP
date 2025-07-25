@@ -3,9 +3,12 @@
 
 from typing import Callable
 from fastmcp import FastMCP
-from dotenv import load_dotenv
+from yml_env_loader import load_yml_and_set_env
 import logging
 import os
+
+# 优先加载config.yml并注入环境变量
+load_yml_and_set_env("server")
 
 # 初始化MCP服务器
 mcp = FastMCP(
@@ -24,17 +27,6 @@ logging.basicConfig(
 
 logger = logging.getLogger("PMS")
 logger.setLevel(logger_level)
-
-# 加载环境变量
-ENV_PATH = [
-    ".env",
-]
-for env_path in ENV_PATH:
-    if os.path.exists(env_path):
-        load_dotenv(env_path, override=True)
-        logger.info(f"env file loaded: {env_path}")
-    else:
-        logger.warning(f"env file not found: {env_path}, skip loading")
 
 if __name__ == "__main__":
     logger.info(os.getenv("ABC"))

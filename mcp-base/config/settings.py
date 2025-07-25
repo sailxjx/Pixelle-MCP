@@ -12,9 +12,10 @@ from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
+from yml_env_loader import load_yml_and_set_env
 
-# 加载环境变量
-load_dotenv()
+# 优先加载config.yml并注入环境变量
+load_yml_and_set_env("base")
 
 
 class StorageType(str, Enum):
@@ -33,8 +34,8 @@ class Settings(BaseSettings):
     debug: bool = False
     
     # 服务器配置
-    base_server_host: str = "127.0.0.1"
-    base_server_port: int = 9001
+    server_host: str = "127.0.0.1"
+    server_port: int = 9001
     public_read_url: Optional[str] = None  # 公开访问的URL，用于文件访问
     
     # 存储配置
@@ -66,18 +67,18 @@ class Settings(BaseSettings):
     @property
     def host(self) -> str:
         """兼容性属性，返回base_server_host"""
-        return self.base_server_host
+        return self.server_host
     
     @property
     def port(self) -> int:
         """兼容性属性，返回base_server_port"""
-        return self.base_server_port
+        return self.server_port
     
     def get_base_url(self) -> str:
         """获取基础URL，优先使用PUBLIC_READ_URL，否则根据host:port构建"""
         if self.public_read_url:
             return self.public_read_url
-        return f"http://{self.base_server_host}:{self.base_server_port}"
+        return f"http://{self.server_host}:{self.server_port}"
     
     class Config:
         env_file = ".env"

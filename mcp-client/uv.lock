@@ -1915,6 +1915,7 @@ dependencies = [
     { name = "fastmcp" },
     { name = "openai" },
     { name = "python-dotenv" },
+    { name = "pyyaml" },
     { name = "socksio" },
 ]
 
@@ -1926,6 +1927,7 @@ requires-dist = [
     { name = "fastmcp", specifier = ">=2.7.1" },
     { name = "openai", specifier = ">=1.84.0" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "socksio", specifier = ">=1.0.0" },
 ]
 
