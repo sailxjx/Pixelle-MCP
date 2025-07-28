@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Pixelle 基础服务
+  # Pixelle Base service
   mcp-base:
     build: ./mcp-base
     ports:
@@ -17,7 +17,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # Pixelle MCP 服务端
+  # Pixelle MCP Server
   mcp-server:
     build: ./mcp-server
     depends_on:
@@ -32,7 +32,7 @@ services:
       - MCP_BASE_URL=http://mcp-base:9001
     restart: unless-stopped
 
-  # Pixelle MCP 客户端
+  # Pixelle MCP Client
   mcp-client:
     build: ./mcp-client
     depends_on:
