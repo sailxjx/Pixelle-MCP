@@ -56,7 +56,7 @@ The `mcp-server/workflows` directory contains a set of popular workflows by defa
 **Note: It is strongly recommended to test the workflow in your ComfyUI canvas before copying, to ensure smooth execution later.**
 
 ```shell
-cp -r mcp-server/workflows mcp-server/data/custom_workflows
+cp -r mcp-server/workflows/* mcp-server/data/custom_workflows/
 ```
 
 ### 🚀 3. Start the Services

@@ -57,7 +57,7 @@ cp config.yml.example config.yml
 **注：这里强烈建议在拷贝之前，先将工作流拖进你的ComfyUI画布试运行，以确保后续调用过程中能够顺利执行。**
 
 ```shell
-cp -r mcp-server/workflows mcp-server/data/custom_workflows
+cp -r mcp-server/workflows/* mcp-server/data/custom_workflows/
 ```
 
 ### 🚀 3. 启动服务
