@@ -17,8 +17,8 @@ https://github.com/user-attachments/assets/5c7412bc-bba3-4d6a-9000-ef5d97ebf695
 - [x] 🔄 **全模态支持**: 支持TISV（Text、Image、Sound/Speech、Video）全模态的互转和生成
 - [x] 🧩 **ComfyUI生态**: Server端底层基于[ComfyUI](https://github.com/comfyanonymous/ComfyUI)实现，继承ComfyUI的开放生态下的所有能力
 - [x] 🔧 **零代码开发**: 制定并实现了 Workflow 即 MCP Tool 的方案，0代码开发，即可动态添加新的 MCP Tool
-- [x] 🔌 **MCP协议**: Server端基于[MCP](https://modelcontextprotocol.io/introduction)协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
-- [x] 💻 **Chainlit框架**: Client端基于[Chaintlit](https://github.com/Chainlit/chainlit)框架开发，继承了Chainlit的UI交互控件，支持集成更多的MCP Server
+- [x] 🔌 **MCP Server**: Server端基于[MCP](https://modelcontextprotocol.io/introduction)协议提供功能支持，支持任意mcp client集成（包含但不限于Cursor、Claude Desktop等）
+- [x] 💻 **MCP Client**: Client端基于[Chaintlit](https://github.com/Chainlit/chainlit)框架开发，继承了Chainlit的UI交互控件，支持集成更多的MCP Server
 - [x] 🔄 **灵活部署**: 支持单独部署Server端仅提供MCP Server，或单独部署Client端仅提供MCP Client，或联合部署
 - [x] ⚙️ **统一配置**: 采用 YAML 配置方案，一个配置文件管理所有服务
 
