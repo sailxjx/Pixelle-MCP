@@ -293,7 +293,7 @@ $<参数名>.<字段名>[!][:<描述信息>]
 
 * 🧩 [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 * 💬 [Chainlit](https://github.com/Chainlit/chainlit)
-* 🗄️ [Minio](https://github.com/minio/minio)
+
 * 🔌 [MCP](https://modelcontextprotocol.io/introduction)
 * 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
 * ⚡ [Flux](https://github.com/black-forest-labs/flux)

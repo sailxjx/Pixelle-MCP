@@ -291,7 +291,7 @@ We welcome all forms of contribution! Whether you're a developer, designer, or u
 
 * 🧩 [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 * 💬 [Chainlit](https://github.com/Chainlit/chainlit)
-* 🗄️ [Minio](https://github.com/minio/minio)
+
 * 🔌 [MCP](https://modelcontextprotocol.io/introduction)
 * 🎬 [WanVideo](https://github.com/Wan-Video/Wan2.1)
 * ⚡ [Flux](https://github.com/black-forest-labs/flux)
