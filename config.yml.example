@@ -1,72 +1,73 @@
-# Pixelle MCP 项目配置文件示例
+# Pixelle MCP Project Configuration File Example
 # 
-# 配置加载逻辑：
-# 1. 各服务启动时，优先加载本服务目录下的 config.yml（如 mcp-base/config.yml）
-# 2. 如果本地配置不存在，则兜底加载项目根目录下的 config.yml
-# 3. 两者不会同时加载，只加载找到的第一个配置文件
-# 4. 加载后会自动将对应服务区块的配置注入到环境变量中（变量名大写）
+# Configuration loading logic:
+# 1. When each service starts, it first loads the config.yml in its service directory (e.g., mcp-base/config.yml)
+# 2. If local configuration doesn't exist, it falls back to loading config.yml from the project root directory
+# 3. Both configurations won't be loaded simultaneously, only the first found configuration file will be loaded
+# 4. After loading, the corresponding service block configuration will be automatically injected into environment variables (variable names in uppercase)
 # 
-# 使用建议：
-# - 全局部署：将此文件复制为根目录 config.yml，所有服务共用一个配置文件
-# - 分离部署：将对应区块复制到各服务目录下的 config.yml，独立配置
+# Usage recommendations:
+# - Global deployment: Copy this file to the root directory as config.yml, all services share one configuration file
+# - Separate deployment: Copy the corresponding blocks to config.yml in each service directory for independent configuration
 
 
-# 基础服务配置
+# Base service configuration
 base:
-  # 时区设置
+  # Timezone setting
   tz: Asia/Shanghai
   
-  # 服务配置
+  # Service configuration
   server_host: localhost
   server_port: 9001
-  # 可选, 用于指定公开访问URL, 一般本地服务不需要配置, 服务不在本机时需要配置为局域网IP或域名
+  # Optional, used to specify public access URL, generally not needed for local services, 
+  # configure as LAN IP or domain name when service is not on local machine
   public_read_url: ""
 
 
-# MCP 服务端配置
+# MCP Server configuration
 server:
-  # 时区设置
+  # Timezone setting
   tz: Asia/Shanghai
   
-  # MCP Server 配置
+  # MCP Server configuration
   mcp_host: localhost
   mcp_port: 9002
   
-  # 基础服务配置，如果更改了 base 中的 server_host 或 server_port，请同步更新此处
+  # Base service configuration, update here accordingly if you changed server_host or server_port in base section, 
   mcp_base_url: http://localhost:9001
   
-  # ComfyUI 集成配置
-  # ComfyUI 服务地址
+  # ComfyUI integration configuration
+  # ComfyUI service address
   comfyui_base_url: http://localhost:8188
-  # ComfyUI API Key (如果工作流中用到了API Nodes, 则需要配置该项, 从这里获取: https://platform.comfy.org/profile/api-keys)
+  # ComfyUI API Key (required if API Nodes are used in workflows, 
+  # get it from: https://platform.comfy.org/profile/api-keys)
   comfyui_api_key: ""
 
 
-# MCP 客户端配置
+# MCP Client configuration
 client:
-  # 时区设置
+  # Timezone setting
   tz: Asia/Shanghai
   
-  # MCP Client Web服务配置
-  # Chainlit 框架配置 (用来做chainlit的auth，可以复用，也可以再随机生成)
+  # MCP Client Web service configuration
+  # Chainlit framework configuration (used for chainlit auth, can be reused or randomly generated)
   chainlit_auth_secret: "8Z$9@,BzJv*sxlyfj9JVWDIltov5kx%Buc*kA>O>.oLDsEwGuD.Zm~2y3vBk,m_A"
   chainlit_host: 127.0.0.1
   chainlit_port: 9003
   chainlit_auth_enabled: true
   
-  # 基础服务配置，如果更改了 base 中的 server_host 或 server_port，请同步更新此处
+  # Base service configuration, update here accordingly if you changed server_host or server_port in base section, 
   mcp_base_url: http://localhost:9001
   
-  # LLM 模型配置 (OpenAI和Ollama至少要配置一个, 要配置的模型需要支持tool调用)
-  # OpenAI 配置
+  # LLM model configuration (at least one of OpenAI and Ollama must be configured, the configured model needs to support tool calling)
+  # OpenAI configuration
   openai_base_url: https://api.openai.com/v1
   openai_api_key: ""
-  # 列出要用到的 OpenAI 模型，如果多个，请以英文逗号分隔
+  # List OpenAI models to be used, if multiple, separate with English commas
   chainlit_chat_openai_models: "gpt-4.1"
-  # Ollama 配置（本地模型）
+  # Ollama configuration (local models)
   ollama_base_url: http://localhost:11434/v1
-  # 列出要用到的 Ollama 模型，如果多个，请以英文逗号分隔
+  # List Ollama models to be used, if multiple, separate with English commas
   ollama_models: "qwen3:latest"
-  # 可选，对话的默认模型 (需要在上方的 chainlit_chat_openai_models 或 ollama_models 中)
+  # Optional, default model for conversations (must be in chainlit_chat_openai_models or ollama_models above)
   chainlit_chat_default_model: ""
-  
