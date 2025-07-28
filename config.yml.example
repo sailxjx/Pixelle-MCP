@@ -32,6 +32,9 @@ server:
   mcp_host: localhost
   mcp_port: 9002
   
+  # 基础服务配置，如果更改了 base 中的 server_host 或 server_port，请同步更新此处
+  mcp_base_url: http://localhost:9001
+  
   # ComfyUI 集成配置
   # ComfyUI 服务地址
   comfyui_base_url: http://localhost:8188
@@ -50,6 +53,9 @@ client:
   chainlit_host: 127.0.0.1
   chainlit_port: 9003
   chainlit_auth_enabled: true
+  
+  # 基础服务配置，如果更改了 base 中的 server_host 或 server_port，请同步更新此处
+  mcp_base_url: http://localhost:9001
   
   # LLM 模型配置 (OpenAI和Ollama至少要配置一个, 要配置的模型需要支持tool调用)
   # OpenAI 配置

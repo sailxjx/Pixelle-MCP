@@ -9,9 +9,7 @@
 import os
 from enum import Enum
 from typing import Optional
-from pydantic import Field
 from pydantic_settings import BaseSettings
-from dotenv import load_dotenv
 from yml_env_loader import load_yml_and_set_env
 
 # 优先加载config.yml并注入环境变量
@@ -34,7 +32,7 @@ class Settings(BaseSettings):
     debug: bool = False
     
     # 服务器配置
-    server_host: str = "127.0.0.1"
+    server_host: str = "localhost"
     server_port: int = 9001
     public_read_url: Optional[str] = None  # 公开访问的URL，用于文件访问
     
@@ -62,17 +60,6 @@ class Settings(BaseSettings):
     
     # API配置
     cors_origins: list[str] = ["*"]
-    
-    # 兼容性属性
-    @property
-    def host(self) -> str:
-        """兼容性属性，返回base_server_host"""
-        return self.server_host
-    
-    @property
-    def port(self) -> int:
-        """兼容性属性，返回base_server_port"""
-        return self.server_port
     
     def get_base_url(self) -> str:
         """获取基础URL，优先使用PUBLIC_READ_URL，否则根据host:port构建"""

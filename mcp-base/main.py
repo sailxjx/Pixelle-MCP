@@ -150,7 +150,7 @@ async def check_file_exists(file_id: str):
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=settings.host,
-        port=settings.port,
+        host=settings.server_host,
+        port=settings.server_port,
         reload=settings.debug
     ) 

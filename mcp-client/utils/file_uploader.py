@@ -15,12 +15,13 @@ import uuid
 
 from core.core import logger
 
+MCP_BASE_URL = os.getenv("MCP_BASE_URL", "http://localhost:9001")
 
 class McpBaseUploader:
     """MCP Base 文件上传器"""
     
-    def __init__(self, mcp_base_url: Optional[str] = None):
-        self.mcp_base_url = mcp_base_url or os.getenv("MCP_BASE_URL", "http://localhost:9001")
+    def __init__(self, mcp_base_url: str):
+        self.mcp_base_url = mcp_base_url
         self.upload_endpoint = f"{self.mcp_base_url.rstrip('/')}/upload"
     
     def upload(self, data: Union[bytes, str, Path], filename: Optional[str] = None) -> str:
@@ -144,7 +145,7 @@ class McpBaseUploader:
 
 
 # 创建默认上传器实例
-default_uploader = McpBaseUploader()
+default_uploader = McpBaseUploader(MCP_BASE_URL)
 
 
 def upload(data: Union[bytes, str, Path], filename: Optional[str] = None) -> str:
