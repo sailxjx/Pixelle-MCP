@@ -108,7 +108,7 @@ uv run main.py
 cd mcp-client
 # Install dependencies (only needed on first run or after updates)
 uv sync
-# Start service (for hot-reload in dev mode: uv run chainlit run main.py -w)
+# Start service (for hot-reload in dev mode: uv run chainlit run main.py -w --port 9003)
 uv run main.py
 ```
 

@@ -108,7 +108,7 @@ uv run main.py
 cd mcp-client
 # 安装依赖（仅首次或更新时需要）
 uv sync
-# 启动服务（开发模式需要热更新时，运行：uv run chainlit run main.py -w）
+# 启动服务（开发模式需要热更新时，运行：uv run chainlit run main.py -w --port 9003）
 uv run main.py
 ```
 
