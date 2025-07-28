@@ -146,7 +146,7 @@ After startup, the service addresses are as follows:
 
 ### 🔌 2. Add a Complex MCP Tool
 
-The steps are the same as above, only the workflow part differs ([Download workflow: UI format](docs/t2i_by_flux_turbo_ui.json) and [API format](docs/t2i_by_flux_turbo.json))
+The steps are the same as above, only the workflow part differs (Download workflow: [UI format](docs/t2i_by_flux_turbo_ui.json) and [API format](docs/t2i_by_flux_turbo.json))
 
 ![](docs/t2i_by_flux_turbo.png)
 
