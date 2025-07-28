@@ -279,12 +279,6 @@ We welcome all forms of contribution! Whether you're a developer, designer, or u
 * 🛠️ Submit tested workflow files
 * 📚 Add usage instructions and examples for workflows
 
-### 💬 Community
-* 🎯 Join [Discussions](https://github.com/AIDC-AI/Pixelle-MCP/discussions)
-* 💡 Share experiences and best practices
-* 🤝 Help other users solve problems
-
-
 ## 🙏 Acknowledgements
 
 ❤️ Sincere thanks to the following organizations, projects, and teams for supporting the development and implementation of this project.
