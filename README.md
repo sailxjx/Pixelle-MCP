@@ -215,27 +215,6 @@ You can add a node titled `MCP` in the workflow to provide a tool description:
 2. Set the node title to: `MCP`
 3. Enter a detailed tool description in the value field
 
-### 🎨 Complete Example
-
-Take the image blur tool as an example:
-
-1. **📥 Add LoadImage node**
-   - Set a default image
-   - Change title to: `$image.image!:Image URL to process`
-
-2. **🌀 Add ImageBlur node**
-   - Connect LoadImage output
-   - Set blur radius to 15
-   - Change title to: `$blur_radius.blur_radius:Blur radius, higher value = more blur`
-
-3. **💾 Add SaveImage node**
-   - Connect ImageBlur output
-   - Keep title as `Save Image` (auto-detected)
-
-4. **📝 Add description node (optional)**
-   - Add a `String (Multiline)` node
-   - Set title to: `MCP`
-   - Set value to: `Image blur tool, applies Gaussian blur to input image`
 
 ### ⚠️ Important Notes
 
