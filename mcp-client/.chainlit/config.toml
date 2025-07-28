@@ -115,7 +115,7 @@ custom_build = "public/build/dist"
 
 # Specify optional one or more custom links in the header.
 [[UI.header_links]]
-    name = "Issues"
+    name = "Github"
     display_name = "Github"
     icon_url = "/public/github.svg"
     url = "https://github.com/AIDC-AI/Pixelle-MCP"
