@@ -117,7 +117,7 @@ uv run main.py
 
 After startup, the service addresses are as follows:
 
-- **Client**: 🌐 http://localhost:9003 (Chainlit Web UI)
+- **Client**: 🌐 http://localhost:9003 (Chainlit Web UI, default username and password are both `dev`, can be changed in [`auth.py`](mcp-client/auth/auth.py))
 - **Server**: 🗄️ http://localhost:9002 (MCP Server)
 - **Base Service**: 🔧 http://localhost:9001 (File storage and basic API)
 
