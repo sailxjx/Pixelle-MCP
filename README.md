@@ -1,6 +1,6 @@
 <h1 align="center">🎨 Pixelle MCP</h1>
 
-<p align="center">✨ An AIGC solution based on the MCP protocol, seamlessly converting ComfyUI workflows into Agent tools with zero code, empowering LLM and ComfyUI integration.</p>
+<p align="center">✨ An AIGC solution based on the MCP protocol, seamlessly converting ComfyUI workflows into MCP tools with zero code, empowering LLM and ComfyUI integration.</p>
 
 <p align="center"><b>English</b> | <a href="README_CN.md">中文</a></p>
 
