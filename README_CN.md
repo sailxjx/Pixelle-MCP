@@ -66,7 +66,7 @@ cp config.yml.example config.yml
 cp -r mcp-server/workflows/* mcp-server/data/custom_workflows/
 ```
 
-### 🚀 3. 启动服务
+### 🚀 3. 启动服务（任选其一）
 
 #### 🎯 3.1 Docker方式启动（推荐）
 
@@ -81,7 +81,22 @@ docker compose ps
 docker compose logs -f
 ```
 
-#### 🛠️ 3.2 源码方式启动
+#### 🛠️ 3.2 一键脚本启动
+
+**Linux/macOS 用户**：
+```shell
+# 启动所有服务（前台运行）
+./run.sh
+
+# 启动所有服务（后台运行）
+./run.sh start --daemon
+```
+
+**Windows 用户**：
+
+直接双击根目录下的 `run.bat` 脚本
+
+#### 🛠️ 3.3 手动启动服务
 
 需要先安装 [uv](https://github.com/astral-sh/uv) 环境。
 

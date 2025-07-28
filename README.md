@@ -81,7 +81,22 @@ docker compose ps
 docker compose logs -f
 ```
 
-#### 🛠️ 3.2 Start from Source
+#### 🛠️ 3.2 One-click Script Start
+
+**Linux/macOS users:**
+```shell
+# Start all services (foreground)
+./run.sh
+
+# Start all services (background)
+./run.sh start --daemon
+```
+
+**Windows users:**
+
+Simply double-click the `run.bat` script in the root directory
+
+#### 🛠️ 3.3 Manual Service Start
 
 Requires [uv](https://github.com/astral-sh/uv) environment.
 
