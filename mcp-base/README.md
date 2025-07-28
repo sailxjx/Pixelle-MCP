@@ -4,7 +4,7 @@
 
 ## 🏗️ 架构设计
 
-- **存储抽象层**: 支持多种存储后端（本地文件系统、MinIO等）
+- **存储抽象层**: 支持多种存储后端（本地文件系统等）
 - **文件服务**: 提供统一的文件上传、下载、管理API
 - **配置管理**: 灵活的配置系统，支持环境变量
 
@@ -23,18 +23,11 @@ PORT=9001
 DEBUG=false
 
 # 存储配置
-# 支持的存储类型: local, minio
+# 支持的存储类型: local
 STORAGE_TYPE=local
 
 # 本地存储配置（当STORAGE_TYPE=local时使用）
 LOCAL_STORAGE_PATH=data/files
-
-# MinIO配置（当STORAGE_TYPE=minio时使用）
-MINIO_ENDPOINT=localhost:9000
-MINIO_ACCESS_KEY=minio
-MINIO_SECRET_KEY=minio1234
-MINIO_BUCKET=files
-MINIO_SECURE=false
 
 # 文件配置
 MAX_FILE_SIZE=104857600  # 100MB
@@ -78,10 +71,7 @@ uv run main.py
 - 零外部依赖
 - 适合开发和小规模部署
 
-### MinIO 存储 (minio)
-- 兼容 S3 API
-- 支持分布式部署
-- 适合生产环境
+
 
 ## 🏗️ 目录结构
 

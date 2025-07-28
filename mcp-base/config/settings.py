@@ -19,7 +19,6 @@ load_yml_and_set_env("base")
 class StorageType(str, Enum):
     """存储类型枚举"""
     LOCAL = "local"
-    MINIO = "minio"
     # 未来可扩展: OSS = "oss", COS = "cos"
 
 
@@ -41,13 +40,6 @@ class Settings(BaseSettings):
     
     # 本地存储配置
     local_storage_path: str = "data/files"
-    
-    # MinIO配置（当storage_type=minio时使用）
-    minio_endpoint: Optional[str] = "localhost:9000"
-    minio_access_key: Optional[str] = "minio"
-    minio_secret_key: Optional[str] = "minio1234"
-    minio_bucket: Optional[str] = "files"
-    minio_secure: bool = False
     
     # 文件配置
     max_file_size: int = 100 * 1024 * 1024  # 100MB
