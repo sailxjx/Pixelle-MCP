@@ -9,7 +9,7 @@
 # 使用建议：
 # - 全局部署：将此文件复制为根目录 config.yml，所有服务共用一个配置文件
 # - 分离部署：将对应区块复制到各服务目录下的 config.yml，独立配置
-# - 混合部署：可以根据需要灵活组合全局配置和局部配置
+
 
 # 基础服务配置
 base:
@@ -60,6 +60,7 @@ client:
   # Ollama 配置（本地模型）
   ollama_base_url: http://localhost:11434/v1
   # 列出要用到的 Ollama 模型，如果多个，请以英文逗号分隔
-  ollama_models: ""
+  ollama_models: "qwen3:latest"
   # 可选，对话的默认模型 (需要在上方的 chainlit_chat_openai_models 或 ollama_models 中)
-  chainlit_chat_default_model: "" 
+  chainlit_chat_default_model: ""
+  

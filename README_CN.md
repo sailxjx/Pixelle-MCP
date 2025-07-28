@@ -44,6 +44,16 @@ cp config.yml.example config.yml
 # 根据需要修改配置项
 ```
 
+**📋 详细配置说明：**
+
+配置文件包含三个主要部分：基础服务、MCP服务端、MCP客户端。在 [`config.yml.example`](config.yml.example) 中每个部分都有详细的配置项说明。
+
+**🔍 配置检查清单：**
+- ✅ 已复制 `config.yml.example` 为 `config.yml`
+- ✅ 已配置 ComfyUI 服务地址（确保ComfyUI正在运行）
+- ✅ 已配置至少一个LLM模型（OpenAI或Ollama）
+- ✅ 端口号未被其他服务占用（9001, 9002, 9003）
+
 ### 🔧 2. 添加MCP Tool（可选）
 
 这一步是可选的，只会决定你Agent的能力，不影响正常对话，如果你暂时不需要，可以先跳过。

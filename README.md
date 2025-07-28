@@ -44,6 +44,16 @@ cp config.yml.example config.yml
 # Edit configuration items as needed
 ```
 
+**📋 Detailed Configuration Instructions:**
+
+The configuration file contains three main sections: Basic Service, MCP Server, and MCP Client. Each section has detailed configuration item descriptions in [`config.yml.example`](config.yml.example).
+
+**🔍 Configuration Checklist:**
+- ✅ Copied `config.yml.example` to `config.yml`
+- ✅ Configured ComfyUI service address (ensure ComfyUI is running)
+- ✅ Configured at least one LLM model (OpenAI or Ollama)
+- ✅ Port numbers are not occupied by other services (9001, 9002, 9003)
+
 ### 🔧 2. Add MCP Tool (Optional)
 
 This step is optional and only affects your Agent's capabilities. You can skip it if not needed for now.
