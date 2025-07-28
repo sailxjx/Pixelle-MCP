@@ -8,7 +8,6 @@ dependencies = [
     "boto3>=1.38.34",
     "fastmcp>=2.7.1",
     "pillow>=11.2.1",
-    "python-dotenv>=1.1.0",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
 ]

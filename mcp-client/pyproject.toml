@@ -9,7 +9,6 @@ dependencies = [
     "chainlit>=2.6.2",
     "fastmcp>=2.7.1",
     "openai>=1.84.0",
-    "python-dotenv>=1.1.0",
     "pyyaml>=6.0.2",
     "socksio>=1.0.0",
 ]
