@@ -9,33 +9,33 @@ from comfyui.websocket_executor import WebSocketExecutor
 from comfyui.http_executor import HttpExecutor
 
 # 配置变量
-COMFYUI_WAIT_RESULT_WAY = os.getenv('COMFYUI_WAIT_RESULT_WAY', 'http')
+COMFYUI_EXECUTOR_TYPE = os.getenv('COMFYUI_EXECUTOR_TYPE', 'http')
 
 
 class ComfyUIClient:
     """ComfyUI 客户端 Facade 类，提供统一的对外接口"""
     
-    def __init__(self, base_url: str = None, wait_method: str = None):
+    def __init__(self, base_url: str = None, executor_type: str = None):
         """
         初始化 ComfyUI 客户端
         
         Args:
             base_url: ComfyUI 服务的基础URL
-            wait_method: 等待结果的方式，'websocket' 或 'http'
+            executor_type: 执行器类型，'websocket' 或 'http'
         """
         self.base_url = base_url
-        self.wait_method = wait_method or COMFYUI_WAIT_RESULT_WAY
+        self.executor_type = executor_type or COMFYUI_EXECUTOR_TYPE
         self._executor = None
         
     def _get_executor(self):
         """获取对应的执行器实例"""
         if self._executor is None:
-            if self.wait_method == 'websocket':
+            if self.executor_type == 'websocket':
                 self._executor = WebSocketExecutor(self.base_url)
-            elif self.wait_method == 'http':
+            elif self.executor_type == 'http':
                 self._executor = HttpExecutor(self.base_url)
             else:
-                raise ValueError(f"不支持的等待方式: {self.wait_method}")
+                raise ValueError(f"Unsupported executor type: {self.executor_type}")
         return self._executor
     
     async def execute_workflow(self, workflow_file: str, params: Dict[str, Any] = None) -> ExecuteResult:

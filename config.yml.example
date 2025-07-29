@@ -44,8 +44,8 @@ server:
   comfyui_api_key: ""
   # Cookies used when calling ComfyUI interface, configure this if ComfyUI service requires authentication
   comfyui_cookies: ""
-  # Method for calling ComfyUI interface, supports http and websocket (both are generally supported)
-  comfyui_wait_result_way: http
+  # Executor type for calling ComfyUI interface, supports http and websocket (both are generally supported)
+  comfyui_executor_type: http
 
 
 # MCP Client configuration
