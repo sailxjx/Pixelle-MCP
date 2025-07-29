@@ -10,8 +10,8 @@ from typing import Dict, Any, Optional
 from pydantic import Field
 from core import mcp, logger
 from utils.os_util import get_data_path
-from utils.workflow_parser import WorkflowParser, WorkflowMetadata
-from utils.comfyui_util import execute_workflow
+from comfyui.workflow_parser import WorkflowParser, WorkflowMetadata
+from comfyui.facade import execute_workflow
 
 CUSTOM_WORKFLOW_DIR = get_data_path("custom_workflows")
 os.makedirs(CUSTOM_WORKFLOW_DIR, exist_ok=True)

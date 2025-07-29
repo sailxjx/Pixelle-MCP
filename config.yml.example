@@ -42,6 +42,10 @@ server:
   # ComfyUI API Key (required if API Nodes are used in workflows, 
   # get it from: https://platform.comfy.org/profile/api-keys)
   comfyui_api_key: ""
+  # Cookies used when calling ComfyUI interface, configure this if ComfyUI service requires authentication
+  comfyui_cookies: ""
+  # Method for calling ComfyUI interface, supports http and websocket (both are generally supported)
+  comfyui_wait_result_way: http
 
 
 # MCP Client configuration
