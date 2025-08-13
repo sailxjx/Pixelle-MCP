@@ -182,6 +182,28 @@ show_status() {
     echo "Running services: $running_count/3"
 }
 
+# Start only the server service
+start_server_only() {
+    local daemon_mode=$1
+    
+    print_info "Starting Pixelle MCP server only..."
+    
+    # Clear PID file
+    > "$PID_FILE"
+    
+    # Start server service only
+    start_service "mcp-server" "mcp-server" "9002" "$daemon_mode"
+    
+    print_success "Server started successfully!"
+    echo "🗄️ Server: http://localhost:9002/sse"
+    
+    if [ "$daemon_mode" = "true" ]; then
+        echo "📋 Log directory: $LOG_DIR"
+        echo "🔍 Check status: $0 status"
+        echo "🛑 Stop services: $0 stop"
+    fi
+}
+
 # Show help information
 show_help() {
     echo "Usage: $0 [command] [options]"
@@ -189,6 +211,8 @@ show_help() {
     echo "Commands:"
     echo "  start            Start all services (foreground)"
     echo "  start --daemon   Start all services (background)"
+    echo "  server           Start only the server (foreground)"
+    echo "  server --daemon  Start only the server (background)"
     echo "  stop             Stop all services"
     echo "  restart          Restart all services"
     echo "  status           Check service status"
@@ -197,7 +221,9 @@ show_help() {
     echo ""
     echo "Examples:"
     echo "  $0 start --daemon   # Start services in background"
-    echo "  $0 logs mcp-client  # View client logs"
+    echo "  $0 server           # Start only server in foreground"
+    echo "  $0 server --daemon  # Start only server in background"
+    echo "  $0 logs mcp-server  # View server logs"
     echo "  $0 restart          # Restart all services"
 }
 
@@ -233,7 +259,7 @@ main() {
                 daemon_mode=true
                 shift
                 ;;
-            start|stop|restart|status|logs|help|--help|-h)
+            start|stop|restart|status|logs|server|help|--help|-h)
                 command="$1"
                 shift
                 # Collect remaining arguments
@@ -277,6 +303,19 @@ main() {
             ;;
         stop)
             stop_services
+            ;;
+        server)
+            check_uv
+            stop_services
+            if [ "$daemon_mode" = "true" ]; then
+                start_server_only true
+            else
+                start_server_only false
+                # Wait for server to exit in foreground mode
+                print_info "Press Ctrl+C to stop the server"
+                trap 'stop_services; exit 0' INT TERM
+                wait
+            fi
             ;;
         restart)
             check_uv

@@ -31,13 +31,20 @@ class HttpExecutor(ComfyUIExecutor):
         
         json_data = json.dumps(prompt_data)
         
+        # 准备请求头
+        headers = {"Content-Type": "application/json"}
+        
+        # 如果配置了COMFYUI_API_KEY，添加Bearer token到请求头
+        if COMFYUI_API_KEY:
+            headers["Authorization"] = f"Bearer {COMFYUI_API_KEY}"
+        
         # 使用aiohttp发送请求
         prompt_url = f"{self.base_url}/prompt"
         async with self.get_comfyui_session() as session:
             async with session.post(
                     prompt_url, 
                     data=json_data,
-                    headers={"Content-Type": "application/json"}
+                    headers=headers
                 ) as response:
                 if response.status != 200:
                     response_text = await response.text()
