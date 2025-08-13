@@ -120,28 +120,47 @@ start_service() {
     fi
 }
 
-# Start all services
+# Start specified services
 start_services() {
     local daemon_mode=$1
+    local services_to_start=$2
     
-    print_info "Starting Pixelle MCP services..."
+    # If no services specified, start all
+    if [ -z "$services_to_start" ]; then
+        services_to_start="base,server,client"
+    fi
     
-    # Clear PID file
-    > "$PID_FILE"
+    print_info "Starting Pixelle MCP services: $services_to_start"
     
-    # Start base service
-    start_service "mcp-base" "mcp-base" "9001" "$daemon_mode"
+    # Don't clear PID file - append to it to keep track of all running services
+    if [ ! -f "$PID_FILE" ]; then
+        > "$PID_FILE"
+    fi
     
-    # Start server service  
-    start_service "mcp-server" "mcp-server" "9002" "$daemon_mode"
+    # Parse services and start them
+    IFS=',' read -ra SERVICES <<< "$services_to_start"
+    for service in "${SERVICES[@]}"; do
+        case "$service" in
+            base)
+                start_service "mcp-base" "mcp-base" "9001" "$daemon_mode"
+                echo "🔧 Base Service: http://localhost:9001/docs"
+                ;;
+            server)
+                start_service "mcp-server" "mcp-server" "9002" "$daemon_mode"
+                echo "🗄️ Server: http://localhost:9002/sse"
+                ;;
+            client)
+                start_service "mcp-client" "mcp-client" "9003" "$daemon_mode"
+                echo "🌐 Client: http://localhost:9003"
+                ;;
+            *)
+                print_error "Unknown service: $service"
+                print_info "Available services: base, server, client"
+                ;;
+        esac
+    done
     
-    # Start client service
-    start_service "mcp-client" "mcp-client" "9003" "$daemon_mode"
-    
-    print_success "All services started successfully!"
-    echo "🌐 Client: http://localhost:9003"
-    echo "🗄️ Server: http://localhost:9002/sse"  
-    echo "🔧 Base Service: http://localhost:9001/docs"
+    print_success "Selected services started successfully!"
     
     if [ "$daemon_mode" = "true" ]; then
         echo "📋 Log directory: $LOG_DIR"
@@ -182,49 +201,36 @@ show_status() {
     echo "Running services: $running_count/3"
 }
 
-# Start only the server service
-start_server_only() {
-    local daemon_mode=$1
-    
-    print_info "Starting Pixelle MCP server only..."
-    
-    # Clear PID file
-    > "$PID_FILE"
-    
-    # Start server service only
-    start_service "mcp-server" "mcp-server" "9002" "$daemon_mode"
-    
-    print_success "Server started successfully!"
-    echo "🗄️ Server: http://localhost:9002/sse"
-    
-    if [ "$daemon_mode" = "true" ]; then
-        echo "📋 Log directory: $LOG_DIR"
-        echo "🔍 Check status: $0 status"
-        echo "🛑 Stop services: $0 stop"
-    fi
-}
 
 # Show help information
 show_help() {
     echo "Usage: $0 [command] [options]"
     echo ""
     echo "Commands:"
-    echo "  start            Start all services (foreground)"
-    echo "  start --daemon   Start all services (background)"
-    echo "  server           Start only the server (foreground)"
-    echo "  server --daemon  Start only the server (background)"
-    echo "  stop             Stop all services"
-    echo "  restart          Restart all services"
-    echo "  status           Check service status"
-    echo "  logs [service]   View service logs"
-    echo "  help             Show help information"
+    echo "  start [services]     Start specified services (default: all)"
+    echo "  stop                 Stop all services"
+    echo "  restart [services]   Restart specified services"
+    echo "  status               Check service status"
+    echo "  logs [service]       View service logs"
+    echo "  help                 Show help information"
+    echo ""
+    echo "Options:"
+    echo "  --daemon, -d         Run services in background"
+    echo ""
+    echo "Available services:"
+    echo "  base                 Base service (port 9001)"
+    echo "  server               Server service (port 9002)"
+    echo "  client               Client service (port 9003)"
     echo ""
     echo "Examples:"
-    echo "  $0 start --daemon   # Start services in background"
-    echo "  $0 server           # Start only server in foreground"
-    echo "  $0 server --daemon  # Start only server in background"
-    echo "  $0 logs mcp-server  # View server logs"
-    echo "  $0 restart          # Restart all services"
+    echo "  $0 start                    # Start all services in foreground"
+    echo "  $0 start --daemon           # Start all services in background"
+    echo "  $0 start base               # Start only base service"
+    echo "  $0 start base,server        # Start base and server services"
+    echo "  $0 start server,client -d   # Start server and client in background"
+    echo "  $0 restart base             # Restart only base service"
+    echo "  $0 logs mcp-server          # View server logs"
+    echo "  $0 stop                     # Stop all services"
 }
 
 # View logs
@@ -259,7 +265,7 @@ main() {
                 daemon_mode=true
                 shift
                 ;;
-            start|stop|restart|status|logs|server|help|--help|-h)
+            start|stop|restart|status|logs|help|--help|-h)
                 command="$1"
                 shift
                 # Collect remaining arguments
@@ -290,13 +296,14 @@ main() {
     case "$command" in
         start)
             check_uv
-            stop_services
+            # Get the services list from remaining_args
+            local services_list="${remaining_args[0]}"
             if [ "$daemon_mode" = "true" ]; then
-                start_services true
+                start_services true "$services_list"
             else
-                start_services false
+                start_services false "$services_list"
                 # Wait for any service to exit in foreground mode
-                print_info "Press Ctrl+C to stop all services"
+                print_info "Press Ctrl+C to stop services"
                 trap 'stop_services; exit 0' INT TERM
                 wait
             fi
@@ -304,23 +311,12 @@ main() {
         stop)
             stop_services
             ;;
-        server)
-            check_uv
-            stop_services
-            if [ "$daemon_mode" = "true" ]; then
-                start_server_only true
-            else
-                start_server_only false
-                # Wait for server to exit in foreground mode
-                print_info "Press Ctrl+C to stop the server"
-                trap 'stop_services; exit 0' INT TERM
-                wait
-            fi
-            ;;
         restart)
             check_uv
+            # Get the services list from remaining_args
+            local services_list="${remaining_args[0]}"
             stop_services
-            start_services true
+            start_services true "$services_list"
             ;;
         status)
             show_status
