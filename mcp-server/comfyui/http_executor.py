@@ -81,8 +81,15 @@ class HttpExecutor(ComfyUIExecutor):
 
             # 使用HTTP API获取历史记录
             history_url = f"{self.base_url}/history/{prompt_id}"
+            
+            # 准备请求头
+            headers = {}
+            # 如果配置了COMFYUI_API_KEY，添加Bearer token到请求头
+            if COMFYUI_API_KEY:
+                headers["Authorization"] = f"Bearer {COMFYUI_API_KEY}"
+            
             async with self.get_comfyui_session() as session:
-                async with session.get(history_url) as response:
+                async with session.get(history_url, headers=headers) as response:
                     if response.status != 200:
                         await asyncio.sleep(1.0)
                         continue

@@ -61,8 +61,13 @@ class ComfyUIExecutor(ABC):
             
             # 检查是否是HTTP URL
             if content.startswith(('http://', 'https://')):
+                # 准备请求头
+                headers = {}
+                if COMFYUI_API_KEY:
+                    headers["Authorization"] = f"Bearer {COMFYUI_API_KEY}"
+                
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(content) as response:
+                    async with session.get(content, headers=headers) as response:
                         if response.status != 200:
                             raise Exception(f"从URL获取cookies失败: HTTP {response.status}")
                         content = await response.text()
@@ -96,6 +101,11 @@ class ComfyUIExecutor(ABC):
         
         # 解析 ComfyUI cookies，用于下载需要认证的文件
         cookies = await self._parse_comfyui_cookies()
+        
+        # 准备请求头
+        headers = {}
+        if COMFYUI_API_KEY:
+            headers["Authorization"] = f"Bearer {COMFYUI_API_KEY}"
 
         def transfer_urls(urls: List[str]) -> List[str]:
             # 去重，保留顺序
@@ -109,7 +119,7 @@ class ComfyUIExecutor(ABC):
             # 下载并上传未缓存的url
             uncached_urls = [url for url in unique_urls if url not in url_cache]
             if uncached_urls:
-                with download_files(uncached_urls, cookies=cookies) as temp_files:
+                with download_files(uncached_urls, cookies=cookies, headers=headers) as temp_files:
                     for temp_file, url in zip(temp_files, uncached_urls):
                         new_url = upload(temp_file)
                         url_cache[url] = new_url
@@ -193,8 +203,13 @@ class ComfyUIExecutor(ABC):
 
     async def _upload_media_from_source(self, media_url: str) -> str:
         """从URL上传媒体"""
+        # 准备请求头
+        headers = {}
+        if COMFYUI_API_KEY:
+            headers["Authorization"] = f"Bearer {COMFYUI_API_KEY}"
+        
         async with self.get_comfyui_session() as session:
-            async with session.get(media_url) as response:
+            async with session.get(media_url, headers=headers) as response:
                 if response.status != 200:
                     raise Exception(f"下载媒体失败: HTTP {response.status}")
                 
@@ -240,10 +255,15 @@ class ComfyUIExecutor(ABC):
                        filename=filename, 
                        content_type=mime_type)
         
+        # 准备请求头
+        headers = {}
+        if COMFYUI_API_KEY:
+            headers["Authorization"] = f"Bearer {COMFYUI_API_KEY}"
+        
         # 上传媒体
         upload_url = f"{self.base_url}/upload/image"
         async with self.get_comfyui_session() as session:
-            async with session.post(upload_url, data=data) as response:
+            async with session.post(upload_url, data=data, headers=headers) as response:
                 if response.status != 200:
                     raise Exception(f"上传媒体失败: HTTP {response.status}")
                 

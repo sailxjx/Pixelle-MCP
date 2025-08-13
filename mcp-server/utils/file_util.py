@@ -16,17 +16,17 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 
 @overload
-def download_files(file_urls: str, suffix: str = None, auto_cleanup: bool = True, cookies: dict = None) -> Generator[str, None, None]:
+def download_files(file_urls: str, suffix: str = None, auto_cleanup: bool = True, cookies: dict = None, headers: dict = None) -> Generator[str, None, None]:
     ...
 
 
 @overload
-def download_files(file_urls: List[str], suffix: str = None, auto_cleanup: bool = True, cookies: dict = None) -> Generator[List[str], None, None]:
+def download_files(file_urls: List[str], suffix: str = None, auto_cleanup: bool = True, cookies: dict = None, headers: dict = None) -> Generator[List[str], None, None]:
     ...
 
 
 @contextmanager
-def download_files(file_urls: Union[str, List[str]], suffix: str = None, auto_cleanup: bool = True, cookies: dict = None) -> Generator[Union[str, List[str]], None, None]:
+def download_files(file_urls: Union[str, List[str]], suffix: str = None, auto_cleanup: bool = True, cookies: dict = None, headers: dict = None) -> Generator[Union[str, List[str]], None, None]:
     """
     从 URL 下载文件到临时文件的上下文管理器
     
@@ -35,6 +35,7 @@ def download_files(file_urls: Union[str, List[str]], suffix: str = None, auto_cl
         suffix: 临时文件后缀名，如果不指定则尝试从 URL 推断
         auto_cleanup: 是否自动清理临时文件，默认为 True
         cookies: 请求时使用的 cookies，默认为 None
+        headers: 请求时使用的 headers，默认为 None
         
     Yields:
         str: 如果输入是 str，返回临时文件路径
@@ -50,7 +51,7 @@ def download_files(file_urls: Union[str, List[str]], suffix: str = None, auto_cl
         for url in url_list:
             # 从 URL 下载文件
             logger.info(f"正在从 URL 下载文件: {url}")
-            response = requests.get(url, timeout=30, cookies=cookies)
+            response = requests.get(url, timeout=30, cookies=cookies, headers=headers)
             response.raise_for_status()
             
             # 确定文件后缀
